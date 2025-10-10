@@ -149,10 +149,9 @@ public/
 
 **Sqrilizz** - Developer & Creator
 
-- 🌐 **Website:** [sqrilizz.fun](https://sqrilizz.fun)
-- 💬 **Telegram:** [@estpyro](https://t.me/estpyro)
+- 🌐 **Website:** [sqrilizz.fun | Bio](https://sqrilizz.fun)
+- 💬 **Telegram:** [@sqrilizz](https://t.me/sqrilizz)
 - 📧 **Email:** contact@sqrlizz.xyz
-- 🐙 **GitHub:** [github.com/sqrilizz](https://github.com/sqrilizz)
 - 🎮 **Modrinth:** [modrinth.com/user/Sqrilizz](https://modrinth.com/user/Sqrilizz)
 
 ---
