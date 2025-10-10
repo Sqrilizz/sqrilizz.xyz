@@ -9,7 +9,7 @@
   ![Vite](https://img.shields.io/badge/Vite-4.4.5-646CFF)
   ![Tailwind](https://img.shields.io/badge/Tailwind-3.3.0-38B2AC)
 
-  **🌐 [Посмотреть демо](https://sqrilizz.github.io)** |
+  **🌐 [Посмотреть демо](https://sqrilizz.xyz)** |
   **📧 [Связаться со мной](mailto:contact@sqrlizz.xyz)**
 
 </div>
