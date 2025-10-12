@@ -33,12 +33,8 @@ export default function HomePage() {
   // Загружаем музыку при первом запуске
   useEffect(() => {
     const playlist = [
-      { 
-        title: 'темный принц - овердоз', 
-        src: '/music/temniy.mp3',
-        cover: '/music/covers/temniy.jpg' // Добавь обложку сюда
-      }
-      // Добавь больше треков здесь:
+      { title: 'KSB - Ruinery', src: '/music/KSB_muzic_Ruinery.mp3', cover: '/music/covers/ksb.banner.png' },
+      // Добавьте больше треков здесь:
       // { title: 'Track 2', src: '/music/track2.mp3', cover: '/music/covers/track2.jpg' },
     ]
     
@@ -87,7 +83,7 @@ export default function HomePage() {
               <div className="mt-4 flex gap-3 flex-wrap">
                 <a className="inline-block px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-violet-500 text-white" href={USER.modrinth} target="_blank" rel="noreferrer">Modrinth</a>
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href={USER.socials.github} target="_blank" rel="noreferrer">GitHub</a>
-                <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href={USER.socials.email}>{t('email')}</a>
+                <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href="/contact">Contact</a>
               </div>
 
               <div className="mt-6 text-sm text-gray-400">{t('musicPlaying')}: <span className="text-gray-200">{playlist[currentIndex]?.title || '—'}</span></div>

@@ -242,13 +242,13 @@ export const getUserTag = (user) => {
 // Утилита для получения clan badge
 export const getClanBadgeUrl = (user) => {
   // Проверяем clan
-  if (user?.clan?.badge) {
-    return `https://cdn.discordapp.com/clan-badges/${user.clan.badge}.png?size=32`
+  if (user?.clan?.badge && user?.clan?.identity_guild_id) {
+    return `https://cdn.discordapp.com/clan-badges/${user.clan.identity_guild_id}/${user.clan.badge}.png?size=32`
   }
   
   // Проверяем primary_guild (для OAI и других guild badges)
-  if (user?.primary_guild?.badge && user?.primary_guild?.identity_enabled) {
-    return `https://cdn.discordapp.com/clan-badges/${user.primary_guild.badge}.png?size=32`
+  if (user?.primary_guild?.badge && user?.primary_guild?.identity_enabled && user?.primary_guild?.identity_guild_id) {
+    return `https://cdn.discordapp.com/clan-badges/${user.primary_guild.identity_guild_id}/${user.primary_guild.badge}.png?size=32`
   }
   
   return null

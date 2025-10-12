@@ -9,7 +9,7 @@ export default function MusicPlayer() {
   const [playing, setPlaying] = useState(false)
   const [pos, setPos] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(0.7) // Громкость по умолчанию 70%
+  const [volume, setVolume] = useState(0.1) // Громкость по умолчанию 10%
   const rafRef = useRef(null)
 
   useEffect(() => {
@@ -144,17 +144,27 @@ export default function MusicPlayer() {
 
       {/* Индикатор воспроизведения */}
       <div className="relative z-10 flex justify-center mb-4">
-        {playing && (
-          <div className="flex gap-1 items-end">
-            {[...Array(4)].map((_, i) => (
+        {playing ? (
+          <div className="flex gap-1.5 items-end">
+            {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="w-0.5 bg-gradient-to-t from-purple-500 to-violet-400 rounded-full music-equalizer"
+                className="w-1 bg-gradient-to-t from-purple-500 to-violet-400 rounded-full smooth-equalizer"
                 style={{
-                  animationDelay: `${i * 0.15}s`,
-                  animationDuration: `${0.6 + i * 0.1}s`,
-                  height: `${6 + i * 3}px`
+                  animationDelay: `${i * 0.3}s`,
+                  animationDuration: `${2 + i * 0.2}s`,
+                  height: `${6 + i * 2}px`
                 }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex gap-1.5 items-end">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="w-1 bg-gray-600 rounded-full opacity-30"
+                style={{ height: `${6 + i * 2}px` }}
               />
             ))}
           </div>
