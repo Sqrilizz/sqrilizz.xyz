@@ -1,4 +1,7 @@
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
+
+// Инициализация Redis
+const redis = Redis.fromEnv()
 
 // Ключ для хранения данных в KV
 const KV_KEY = 'wishlist_data'
@@ -85,41 +88,41 @@ const DEFAULT_DATA = {
   }
 }
 
-// Проверяем доступность KV
-const isKVAvailable = () => {
-  return process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+// Проверяем доступность Redis
+const isRedisAvailable = () => {
+  return process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
 }
 
-// Функция для чтения данных из KV или fallback
+// Функция для чтения данных из Redis или fallback
 async function readWishlistData() {
-  if (isKVAvailable()) {
+  if (isRedisAvailable()) {
     try {
-      const data = await kv.get(KV_KEY)
+      const data = await redis.get(KV_KEY)
       return data || DEFAULT_DATA
     } catch (error) {
-      console.error('Ошибка чтения из KV:', error)
+      console.error('Ошибка чтения из Redis:', error)
     }
   }
   
   // Fallback - возвращаем дефолтные данные
-  console.log('KV недоступен, используем дефолтные данные')
+  console.log('Redis недоступен, используем дефолтные данные')
   return DEFAULT_DATA
 }
 
-// Функция для записи данных в KV или fallback
+// Функция для записи данных в Redis или fallback
 async function writeWishlistData(data) {
-  if (isKVAvailable()) {
+  if (isRedisAvailable()) {
     try {
-      await kv.set(KV_KEY, data)
-      console.log('Данные сохранены в KV')
+      await redis.set(KV_KEY, data)
+      console.log('Данные сохранены в Redis')
       return true
     } catch (error) {
-      console.error('Ошибка записи в KV:', error)
+      console.error('Ошибка записи в Redis:', error)
     }
   }
   
   // Fallback - логируем что данные не сохранены
-  console.log('KV недоступен, данные не сохранены (только в памяти)')
+  console.log('Redis недоступен, данные не сохранены (только в памяти)')
   return false
 }
 
