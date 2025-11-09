@@ -52,25 +52,38 @@ export default function WishlistAdmin() {
       setIsAuthenticated(true)
     }
 
-    // Загружаем wishlist
-    const savedWishlist = localStorage.getItem('wishlist_items')
-    if (savedWishlist) {
-      setWishlistItems(JSON.parse(savedWishlist))
-    } else {
-      setWishlistItems(DEFAULT_WISHLIST)
+    // Загружаем данные
+    const loadWishlistData = async () => {
+      try {
+        // Сначала пробуем загрузить из localStorage (локальные изменения)
+        const savedWishlist = localStorage.getItem('wishlist_items')
+        const savedCategories = localStorage.getItem('wishlist_categories')
+        const savedPriorities = localStorage.getItem('wishlist_priorities')
+
+        if (savedWishlist || savedCategories || savedPriorities) {
+          // Есть локальные изменения
+          setWishlistItems(savedWishlist ? JSON.parse(savedWishlist) : [])
+          setCategories(savedCategories ? JSON.parse(savedCategories) : CATEGORIES)
+          setPriorities(savedPriorities ? JSON.parse(savedPriorities) : PRIORITIES)
+        } else {
+          // Загружаем из JSON файла
+          const response = await fetch('/data/wishlist.json')
+          const data = await response.json()
+          
+          setWishlistItems(data.items || [])
+          setCategories(data.categories || CATEGORIES)
+          setPriorities(data.priorities || PRIORITIES)
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки wishlist:', error)
+        // Fallback на дефолтные значения
+        setWishlistItems(DEFAULT_WISHLIST)
+        setCategories(CATEGORIES)
+        setPriorities(PRIORITIES)
+      }
     }
 
-    // Загружаем категории
-    const savedCategories = localStorage.getItem('wishlist_categories')
-    if (savedCategories) {
-      setCategories(JSON.parse(savedCategories))
-    }
-
-    // Загружаем приоритеты
-    const savedPriorities = localStorage.getItem('wishlist_priorities')
-    if (savedPriorities) {
-      setPriorities(JSON.parse(savedPriorities))
-    }
+    loadWishlistData()
   }, [])
 
   const handleLogin = (e) => {
@@ -102,6 +115,29 @@ export default function WishlistAdmin() {
   const savePriorities = (newPriorities) => {
     setPriorities(newPriorities)
     localStorage.setItem('wishlist_priorities', JSON.stringify(newPriorities))
+  }
+
+  const resetToDefault = async () => {
+    if (confirm('Сбросить все данные к исходным из файла? Все локальные изменения будут потеряны.')) {
+      try {
+        const response = await fetch('/data/wishlist.json')
+        const data = await response.json()
+        
+        setWishlistItems(data.items || [])
+        setCategories(data.categories || CATEGORIES)
+        setPriorities(data.priorities || PRIORITIES)
+        
+        // Очищаем localStorage
+        localStorage.removeItem('wishlist_items')
+        localStorage.removeItem('wishlist_categories')
+        localStorage.removeItem('wishlist_priorities')
+        
+        alert('Данные сброшены к исходным!')
+      } catch (error) {
+        console.error('Ошибка сброса данных:', error)
+        alert('Ошибка при сбросе данных')
+      }
+    }
   }
 
   const handleSubmit = (e) => {
@@ -230,6 +266,12 @@ export default function WishlistAdmin() {
             >
               👁️ Посмотреть Wishlist
             </a>
+            <button
+              onClick={resetToDefault}
+              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-lg transition-colors"
+            >
+              🔄 Сбросить к исходным
+            </button>
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"

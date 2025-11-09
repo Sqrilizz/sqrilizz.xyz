@@ -30,25 +30,25 @@ export default function WishlistPage() {
   const [priorities, setPriorities] = useState(PRIORITIES)
 
   useEffect(() => {
-    // Загружаем wishlist из localStorage или используем дефолтный
-    const savedWishlist = localStorage.getItem('wishlist_items')
-    if (savedWishlist) {
-      setWishlistItems(JSON.parse(savedWishlist))
-    } else {
-      setWishlistItems(DEFAULT_WISHLIST_ITEMS)
+    // Загружаем данные из JSON файла
+    const loadWishlistData = async () => {
+      try {
+        const response = await fetch('/data/wishlist.json')
+        const data = await response.json()
+        
+        setWishlistItems(data.items || [])
+        setCategories(data.categories || CATEGORIES)
+        setPriorities(data.priorities || PRIORITIES)
+      } catch (error) {
+        console.error('Ошибка загрузки wishlist:', error)
+        // Fallback на дефолтные значения
+        setWishlistItems(DEFAULT_WISHLIST_ITEMS)
+        setCategories(CATEGORIES)
+        setPriorities(PRIORITIES)
+      }
     }
 
-    // Загружаем категории
-    const savedCategories = localStorage.getItem('wishlist_categories')
-    if (savedCategories) {
-      setCategories(JSON.parse(savedCategories))
-    }
-
-    // Загружаем приоритеты
-    const savedPriorities = localStorage.getItem('wishlist_priorities')
-    if (savedPriorities) {
-      setPriorities(JSON.parse(savedPriorities))
-    }
+    loadWishlistData()
   }, [])
 
   const filteredItems = wishlistItems.filter(item => {
