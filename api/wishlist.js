@@ -1,9 +1,22 @@
 import { Redis } from '@upstash/redis'
 
 // Инициализация Redis
+const getRedisUrl = () => {
+  const url = process.env.SqrilizzStorage_KV_REST_API_URL || 
+             process.env.sqrilizStorage_KV_REST_API_URL || 
+             process.env.UPSTASH_REDIS_REST_URL
+  // Убеждаемся что URL начинается с https://
+  if (url && !url.startsWith('http')) {
+    return `https://${url}`
+  }
+  return url
+}
+
 const redis = new Redis({
-  url: process.env.sqrilizStorage_KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.sqrilizStorage_KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN,
+  url: getRedisUrl(),
+  token: process.env.SqrilizzStorage_KV_REST_API_TOKEN || 
+         process.env.sqrilizStorage_KV_REST_API_TOKEN || 
+         process.env.UPSTASH_REDIS_REST_TOKEN,
 })
 
 // Ключ для хранения данных в KV
@@ -94,8 +107,9 @@ const DEFAULT_DATA = {
 // Проверяем доступность Redis
 const isRedisAvailable = () => {
   return (
-    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) ||
-    (process.env.sqrilizStorage_KV_REST_API_URL && process.env.sqrilizStorage_KV_REST_API_TOKEN)
+    (process.env.SqrilizzStorage_KV_REST_API_URL && process.env.SqrilizzStorage_KV_REST_API_TOKEN) ||
+    (process.env.sqrilizStorage_KV_REST_API_URL && process.env.sqrilizStorage_KV_REST_API_TOKEN) ||
+    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
   )
 }
 
@@ -103,15 +117,25 @@ const isRedisAvailable = () => {
 async function readWishlistData() {
   if (isRedisAvailable()) {
     try {
+      console.log('Попытка чтения из Redis...')
       const data = await redis.get(KV_KEY)
+      console.log('Данные успешно прочитаны из Redis')
       return data || DEFAULT_DATA
     } catch (error) {
-      console.error('Ошибка чтения из Redis:', error)
+      console.error('Ошибка чтения из Redis:', error.message)
+      console.error('Redis URL:', getRedisUrl())
     }
+  } else {
+    console.log('Redis переменные недоступны:', {
+      SqrilizzStorage_url: !!process.env.SqrilizzStorage_KV_REST_API_URL,
+      SqrilizzStorage_token: !!process.env.SqrilizzStorage_KV_REST_API_TOKEN,
+      sqrilizStorage_url: !!process.env.sqrilizStorage_KV_REST_API_URL,
+      sqrilizStorage_token: !!process.env.sqrilizStorage_KV_REST_API_TOKEN
+    })
   }
   
   // Fallback - возвращаем дефолтные данные
-  console.log('Redis недоступен, используем дефолтные данные')
+  console.log('Используем дефолтные данные')
   return DEFAULT_DATA
 }
 
@@ -119,16 +143,20 @@ async function readWishlistData() {
 async function writeWishlistData(data) {
   if (isRedisAvailable()) {
     try {
+      console.log('Попытка записи в Redis...')
       await redis.set(KV_KEY, data)
-      console.log('Данные сохранены в Redis')
+      console.log('Данные успешно сохранены в Redis')
       return true
     } catch (error) {
-      console.error('Ошибка записи в Redis:', error)
+      console.error('Ошибка записи в Redis:', error.message)
+      console.error('Redis URL:', getRedisUrl())
     }
+  } else {
+    console.log('Redis переменные недоступны для записи')
   }
   
   // Fallback - логируем что данные не сохранены
-  console.log('Redis недоступен, данные не сохранены (только в памяти)')
+  console.log('Данные не сохранены (только в памяти)')
   return false
 }
 
