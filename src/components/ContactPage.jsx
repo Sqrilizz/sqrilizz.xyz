@@ -323,7 +323,7 @@ export default function ContactPage() {
               </motion.a>
               
               <motion.a
-                href="https://discord.com/users/sqrilizz.auryx"
+                href="https://discord.com/users/sqrilizz"
                 target="_blank"
                 rel="noreferrer"
                 whileHover={{ scale: 1.1, rotate: -5 }}

@@ -18,7 +18,7 @@ const USER = {
   modrinth: 'https://modrinth.com/user/Sqrilizz',
   socials: {
     telegram: 'https://t.me/sqrilizz',
-    discord: 'https://discord.com/users/sqrilizz.auryx',
+    discord: 'https://discord.com/users/sqrilizz',
     instagram: 'https://instagram.com/Matve1m0k1',
     github: 'https://github.com/sqrilizz',
     email: 'mailto:contact@sqrlizz.xyz'
@@ -84,6 +84,7 @@ export default function HomePage() {
                 <a className="inline-block px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-violet-500 text-white" href={USER.modrinth} target="_blank" rel="noreferrer">Modrinth</a>
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href={USER.socials.github} target="_blank" rel="noreferrer">GitHub</a>
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href="/contact">Contact</a>
+                <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href="/wishlist">🎯 Wishlist</a>
               </div>
 
               <div className="mt-6 text-sm text-gray-400">{t('musicPlaying')}: <span className="text-gray-200">{playlist[currentIndex]?.title || '—'}</span></div>

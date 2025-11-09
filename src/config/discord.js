@@ -1,7 +1,7 @@
 // Discord API конфигурация
 export const DISCORD_CONFIG = {
   // Ваш Discord User ID
-  USER_ID: '1420739651970269284', // Ваш реальный Discord ID
+  USER_ID: '1401591841115078862', // Ваш реальный Discord ID
   
   // Lanyard API endpoint (бесплатный сервис для Discord RPC)
   LANYARD_API: 'https://api.lanyard.rest/v1/users/',

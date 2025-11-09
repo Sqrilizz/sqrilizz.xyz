@@ -13,12 +13,12 @@ export default function ProfileCard({ user }) {
     >
       <div className="flex items-center gap-4">
         <div className="relative">
-          <div className="w-20 h-20 bg-[rgba(255,255,255,0.02)] flex items-center justify-center text-xl font-semibold overflow-hidden">
+          <div className="w-24 h-24 bg-[rgba(255,255,255,0.02)] flex items-center justify-center text-xl font-semibold overflow-hidden rounded-xl">
             {/* Замени '/avatar.png' на путь к своему аватару */}
             <img 
-              src="/avatar.png" 
-              alt={user.nick}
-              className="w-full h-full object-cover aspect-square"
+              src="https://cdn.discordapp.com/avatars/1401591841115078862/fd0db874af9a33b695c143223e7928f0.png?size=128" 
+              alt="sqrilizz"
+              className="w-full h-full object-cover"
               onError={(e) => {
                 e.target.style.display = 'none'
                 e.target.nextSibling.style.display = 'flex'
@@ -54,7 +54,7 @@ export default function ProfileCard({ user }) {
         <button 
           className="w-10 h-10 rounded-full flex items-center justify-center bg-[rgba(90,89,185,0.12)] hover:bg-[rgba(90,89,185,0.2)] transition-colors group relative" 
           onClick={() => {
-            navigator.clipboard.writeText('sqrilizz.auryx')
+            navigator.clipboard.writeText('sqrilizz')
             // Показать уведомление
             const btn = event.currentTarget
             const tooltip = btn.querySelector('.tooltip')
