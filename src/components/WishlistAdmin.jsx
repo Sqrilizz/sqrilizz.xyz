@@ -55,31 +55,42 @@ export default function WishlistAdmin() {
     // Загружаем данные
     const loadWishlistData = async () => {
       try {
-        // Сначала пробуем загрузить из localStorage (локальные изменения)
-        const savedWishlist = localStorage.getItem('wishlist_items')
-        const savedCategories = localStorage.getItem('wishlist_categories')
-        const savedPriorities = localStorage.getItem('wishlist_priorities')
-
-        if (savedWishlist || savedCategories || savedPriorities) {
-          // Есть локальные изменения
-          setWishlistItems(savedWishlist ? JSON.parse(savedWishlist) : [])
-          setCategories(savedCategories ? JSON.parse(savedCategories) : CATEGORIES)
-          setPriorities(savedPriorities ? JSON.parse(savedPriorities) : PRIORITIES)
-        } else {
-          // Загружаем из JSON файла
-          const response = await fetch('/data/wishlist.json')
-          const data = await response.json()
-          
-          setWishlistItems(data.items || [])
-          setCategories(data.categories || CATEGORIES)
-          setPriorities(data.priorities || PRIORITIES)
-        }
+        // Загружаем через API
+        const response = await fetch('/api/wishlist')
+        const data = await response.json()
+        
+        setWishlistItems(data.items || [])
+        setCategories(data.categories || CATEGORIES)
+        setPriorities(data.priorities || PRIORITIES)
       } catch (error) {
-        console.error('Ошибка загрузки wishlist:', error)
-        // Fallback на дефолтные значения
-        setWishlistItems(DEFAULT_WISHLIST)
-        setCategories(CATEGORIES)
-        setPriorities(PRIORITIES)
+        console.error('Ошибка загрузки через API:', error)
+        
+        // Fallback - пробуем localStorage
+        try {
+          const savedWishlist = localStorage.getItem('wishlist_items')
+          const savedCategories = localStorage.getItem('wishlist_categories')
+          const savedPriorities = localStorage.getItem('wishlist_priorities')
+
+          if (savedWishlist || savedCategories || savedPriorities) {
+            setWishlistItems(savedWishlist ? JSON.parse(savedWishlist) : [])
+            setCategories(savedCategories ? JSON.parse(savedCategories) : CATEGORIES)
+            setPriorities(savedPriorities ? JSON.parse(savedPriorities) : PRIORITIES)
+          } else {
+            // Последний fallback - статический файл
+            const fallbackResponse = await fetch('/data/wishlist.json')
+            const fallbackData = await fallbackResponse.json()
+            
+            setWishlistItems(fallbackData.items || [])
+            setCategories(fallbackData.categories || CATEGORIES)
+            setPriorities(fallbackData.priorities || PRIORITIES)
+          }
+        } catch (fallbackError) {
+          console.error('Ошибка fallback загрузки:', fallbackError)
+          // Дефолтные значения
+          setWishlistItems(DEFAULT_WISHLIST)
+          setCategories(CATEGORIES)
+          setPriorities(PRIORITIES)
+        }
       }
     }
 
@@ -102,40 +113,135 @@ export default function WishlistAdmin() {
     localStorage.removeItem('wishlist_admin_auth')
   }
 
-  const saveWishlist = (newWishlist) => {
+  const saveWishlist = async (newWishlist) => {
     setWishlistItems(newWishlist)
-    localStorage.setItem('wishlist_items', JSON.stringify(newWishlist))
+    
+    // Сохраняем через API
+    try {
+      const fullData = {
+        items: newWishlist,
+        categories: categories,
+        priorities: priorities
+      }
+      
+      const response = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fullData)
+      })
+      
+      if (response.ok) {
+        console.log('Данные сохранены на сервере')
+        // Также сохраняем локально как backup
+        localStorage.setItem('wishlist_items', JSON.stringify(newWishlist))
+      } else {
+        throw new Error('Ошибка сохранения на сервере')
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения через API:', error)
+      // Fallback - сохраняем только локально
+      localStorage.setItem('wishlist_items', JSON.stringify(newWishlist))
+      alert('Ошибка сохранения на сервере. Данные сохранены только локально.')
+    }
   }
 
-  const saveCategories = (newCategories) => {
+  const saveCategories = async (newCategories) => {
     setCategories(newCategories)
-    localStorage.setItem('wishlist_categories', JSON.stringify(newCategories))
+    
+    try {
+      const fullData = {
+        items: wishlistItems,
+        categories: newCategories,
+        priorities: priorities
+      }
+      
+      const response = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fullData)
+      })
+      
+      if (response.ok) {
+        console.log('Категории сохранены на сервере')
+        localStorage.setItem('wishlist_categories', JSON.stringify(newCategories))
+      } else {
+        throw new Error('Ошибка сохранения категорий')
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения категорий:', error)
+      localStorage.setItem('wishlist_categories', JSON.stringify(newCategories))
+      alert('Ошибка сохранения категорий на сервере.')
+    }
   }
 
-  const savePriorities = (newPriorities) => {
+  const savePriorities = async (newPriorities) => {
     setPriorities(newPriorities)
-    localStorage.setItem('wishlist_priorities', JSON.stringify(newPriorities))
+    
+    try {
+      const fullData = {
+        items: wishlistItems,
+        categories: categories,
+        priorities: newPriorities
+      }
+      
+      const response = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fullData)
+      })
+      
+      if (response.ok) {
+        console.log('Приоритеты сохранены на сервере')
+        localStorage.setItem('wishlist_priorities', JSON.stringify(newPriorities))
+      } else {
+        throw new Error('Ошибка сохранения приоритетов')
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения приоритетов:', error)
+      localStorage.setItem('wishlist_priorities', JSON.stringify(newPriorities))
+      alert('Ошибка сохранения приоритетов на сервере.')
+    }
   }
 
   const resetToDefault = async () => {
     if (confirm('Сбросить все данные к исходным из файла? Все локальные изменения будут потеряны.')) {
       try {
+        // Загружаем исходные данные из статического файла
         const response = await fetch('/data/wishlist.json')
         const data = await response.json()
         
-        setWishlistItems(data.items || [])
-        setCategories(data.categories || CATEGORIES)
-        setPriorities(data.priorities || PRIORITIES)
+        // Сохраняем исходные данные через API
+        const saveResponse = await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        })
         
-        // Очищаем localStorage
-        localStorage.removeItem('wishlist_items')
-        localStorage.removeItem('wishlist_categories')
-        localStorage.removeItem('wishlist_priorities')
-        
-        alert('Данные сброшены к исходным!')
+        if (saveResponse.ok) {
+          setWishlistItems(data.items || [])
+          setCategories(data.categories || CATEGORIES)
+          setPriorities(data.priorities || PRIORITIES)
+          
+          // Очищаем localStorage
+          localStorage.removeItem('wishlist_items')
+          localStorage.removeItem('wishlist_categories')
+          localStorage.removeItem('wishlist_priorities')
+          
+          alert('Данные сброшены к исходным и сохранены на сервере!')
+        } else {
+          throw new Error('Ошибка сохранения на сервере')
+        }
       } catch (error) {
         console.error('Ошибка сброса данных:', error)
-        alert('Ошибка при сбросе данных')
+        alert('Ошибка при сбросе данных: ' + error.message)
       }
     }
   }

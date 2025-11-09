@@ -30,10 +30,10 @@ export default function WishlistPage() {
   const [priorities, setPriorities] = useState(PRIORITIES)
 
   useEffect(() => {
-    // Загружаем данные из JSON файла
+    // Загружаем данные через API
     const loadWishlistData = async () => {
       try {
-        const response = await fetch('/data/wishlist.json')
+        const response = await fetch('/api/wishlist')
         const data = await response.json()
         
         setWishlistItems(data.items || [])
@@ -41,10 +41,21 @@ export default function WishlistPage() {
         setPriorities(data.priorities || PRIORITIES)
       } catch (error) {
         console.error('Ошибка загрузки wishlist:', error)
-        // Fallback на дефолтные значения
-        setWishlistItems(DEFAULT_WISHLIST_ITEMS)
-        setCategories(CATEGORIES)
-        setPriorities(PRIORITIES)
+        // Fallback - пробуем загрузить из статического файла
+        try {
+          const fallbackResponse = await fetch('/data/wishlist.json')
+          const fallbackData = await fallbackResponse.json()
+          
+          setWishlistItems(fallbackData.items || [])
+          setCategories(fallbackData.categories || CATEGORIES)
+          setPriorities(fallbackData.priorities || PRIORITIES)
+        } catch (fallbackError) {
+          console.error('Ошибка fallback загрузки:', fallbackError)
+          // Последний fallback на дефолтные значения
+          setWishlistItems(DEFAULT_WISHLIST_ITEMS)
+          setCategories(CATEGORIES)
+          setPriorities(PRIORITIES)
+        }
       }
     }
 
