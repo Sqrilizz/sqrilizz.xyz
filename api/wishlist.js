@@ -1,7 +1,10 @@
 import { Redis } from '@upstash/redis'
 
 // Инициализация Redis
-const redis = Redis.fromEnv()
+const redis = new Redis({
+  url: process.env.sqrilizStorage_KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.sqrilizStorage_KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN,
+})
 
 // Ключ для хранения данных в KV
 const KV_KEY = 'wishlist_data'
@@ -90,7 +93,10 @@ const DEFAULT_DATA = {
 
 // Проверяем доступность Redis
 const isRedisAvailable = () => {
-  return process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  return (
+    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) ||
+    (process.env.sqrilizStorage_KV_REST_API_URL && process.env.sqrilizStorage_KV_REST_API_TOKEN)
+  )
 }
 
 // Функция для чтения данных из Redis или fallback
