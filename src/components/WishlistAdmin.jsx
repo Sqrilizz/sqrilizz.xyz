@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import StarField from './StarField'
 import LanguageSwitcher from './LanguageSwitcher'
+import CategoryManager from './CategoryManager'
 
 const ADMIN_PASSWORD = 'sqrilizz2024' // Измените на свой пароль
 
@@ -486,9 +487,23 @@ export default function WishlistAdmin() {
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:border-purple-500 focus:outline-none"
                 >
-                  {Object.entries(CATEGORIES).map(([key, cat]) => (
-                    <option key={key} value={key}>{cat.icon} {cat.name}</option>
-                  ))}
+                  {Object.entries(categories).filter(([key]) => key !== 'all').map(([key, cat]) => {
+                    const categoryNames = {
+                      hardware: 'Железо', 
+                      gaming: 'Игры',
+                      peripherals: 'Периферия',
+                      audio: 'Аудио',
+                      photography: 'Фото/Видео',
+                      software: 'Софт',
+                      books: 'Книги',
+                      other: 'Другое'
+                    }
+                    return (
+                      <option key={key} value={key}>
+                        {cat.icon} {cat.name || categoryNames[key] || key}
+                      </option>
+                    )
+                  })}
                 </select>
               </div>
 
@@ -589,7 +604,19 @@ export default function WishlistAdmin() {
                   <span className="text-green-400 font-bold">{item.price}</span>
                   <div className="flex gap-2">
                     <span className="px-2 py-1 bg-gray-700 rounded text-xs">
-                      {CATEGORIES[item.category]?.icon} {CATEGORIES[item.category]?.name}
+                      {categories[item.category]?.icon} {(() => {
+                        const categoryNames = {
+                          hardware: 'Железо', 
+                          gaming: 'Игры',
+                          peripherals: 'Периферия',
+                          audio: 'Аудио',
+                          photography: 'Фото/Видео',
+                          software: 'Софт',
+                          books: 'Книги',
+                          other: 'Другое'
+                        }
+                        return categories[item.category]?.name || categoryNames[item.category] || item.category
+                      })()}
                     </span>
                     <span className={`px-2 py-1 rounded text-xs ${
                       item.priority === 'high' ? 'bg-red-500/20 text-red-300' :
@@ -628,19 +655,82 @@ export default function WishlistAdmin() {
 
         {/* Categories Tab */}
         {activeTab === 'categories' && (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4">🏷️</div>
-            <h3 className="text-xl font-semibold mb-2">Управление категориями</h3>
-            <p className="text-gray-400">Функция в разработке</p>
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
+            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              🏷️ Управление категориями
+            </h3>
+            
+            <div className="mb-6">
+              <h4 className="text-lg font-medium mb-4">Текущие категории:</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {Object.entries(categories).map(([key, category]) => {
+                  const categoryNames = {
+                    all: 'Все',
+                    hardware: 'Железо', 
+                    gaming: 'Игры',
+                    peripherals: 'Периферия',
+                    audio: 'Аудио',
+                    photography: 'Фото/Видео',
+                    software: 'Софт',
+                    books: 'Книги',
+                    other: 'Другое'
+                  }
+                  return (
+                    <div key={key} className="flex items-center justify-between bg-gray-800/50 rounded-lg px-4 py-3">
+                      <span className="text-sm">
+                        {category.icon} {category.name || categoryNames[key] || key}
+                      </span>
+                      {!['all', 'hardware', 'gaming', 'peripherals', 'audio', 'photography', 'software', 'books', 'other'].includes(key) && (
+                        <button
+                          onClick={() => {
+                            const updatedCategories = { ...categories }
+                            delete updatedCategories[key]
+                            saveCategories(updatedCategories)
+                          }}
+                          className="text-red-400 hover:text-red-300 text-xs ml-2"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            
+            <CategoryManager 
+              categories={categories} 
+              onCategoriesUpdate={saveCategories}
+            />
           </div>
         )}
 
         {/* Priorities Tab */}
         {activeTab === 'priorities' && (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4">⚡</div>
-            <h3 className="text-xl font-semibold mb-2">Управление приоритетами</h3>
-            <p className="text-gray-400">Функция в разработке</p>
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
+            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              ⚡ Управление приоритетами
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {Object.entries(priorities).map(([key, priority]) => (
+                <div key={key} className="bg-gray-800/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium">{priority.name}</h4>
+                    <div className={`w-4 h-4 rounded bg-gradient-to-r ${priority.color}`}></div>
+                  </div>
+                  <p className="text-sm text-gray-400">
+                    Цвет: <code className="bg-gray-700 px-1 rounded text-xs">{priority.color}</code>
+                  </p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <p className="text-sm text-blue-300">
+                💡 Приоритеты настроены по умолчанию. Для изменения цветов отредактируйте код в WishlistAdmin.jsx
+              </p>
+            </div>
           </div>
         )}
         </div>

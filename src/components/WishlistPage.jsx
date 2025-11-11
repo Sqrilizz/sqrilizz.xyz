@@ -69,7 +69,7 @@ export default function WishlistPage() {
   })
 
   const totalPrice = filteredItems.reduce((sum, item) => {
-    const price = parseFloat(item.price.replace(/[$,]/g, ''))
+    const price = parseFloat(item.price.replace(/[€,$]/g, ''))
     return sum + price
   }, 0)
 
@@ -91,8 +91,11 @@ export default function WishlistPage() {
             transition={{ duration: 1, delay: 0.2 }}
             className="relative inline-block mb-6"
           >
-            <h1 className="text-6xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 relative">
-              🎯 {t('wishlist')}
+            <h1 className="text-6xl md:text-7xl font-bold relative flex items-center justify-center gap-4">
+              <span className="text-6xl md:text-7xl">🎯</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-red-400">
+                Wishlist
+              </span>
             </h1>
             <motion.div
               animate={{ 
@@ -134,7 +137,7 @@ export default function WishlistPage() {
               className="px-6 py-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30 backdrop-blur-sm shadow-lg"
             >
               <span className="text-green-300">💰</span>
-              <span className="ml-2 font-medium">{t('totalCost')}: ${totalPrice.toLocaleString()}</span>
+              <span className="ml-2 font-medium">{t('totalCost')}: €{totalPrice.toLocaleString()}</span>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -162,7 +165,7 @@ export default function WishlistPage() {
                         : 'bg-gray-800/60 text-gray-300 hover:bg-gray-700/60 border border-gray-600/50'
                     }`}
                   >
-                    {category.icon} {t(category.nameKey)}
+                    {category.icon} {category.name || t(category.nameKey)}
                   </motion.button>
                 ))}
               </div>
@@ -213,7 +216,7 @@ export default function WishlistPage() {
               className="card hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 group"
             >
               {/* Image */}
-              <div className="relative h-52 overflow-hidden">
+              <div className="relative h-40 overflow-hidden">
                 <motion.img
                   src={item.image}
                   alt={item.title}
@@ -245,22 +248,22 @@ export default function WishlistPage() {
                   className="absolute top-4 left-4"
                 >
                   <div className="px-3 py-1 rounded-full text-xs font-medium bg-black/70 text-white backdrop-blur-sm border border-white/20">
-                    {categories[item.category]?.icon} {categories[item.category]?.nameKey ? t(categories[item.category].nameKey) : item.category}
+                    {categories[item.category]?.icon} {categories[item.category]?.name || t(categories[item.category]?.nameKey) || item.category}
                   </div>
                 </motion.div>
               </div>
 
               {/* Content */}
-              <div className="p-6 relative">
+              <div className="p-4 relative">
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 + 1.6 }}
                 >
-                  <h3 className="text-xl font-bold mb-3 text-white group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300">
+                  <h3 className="text-lg font-bold mb-2 text-white group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 text-sm mb-4 leading-relaxed line-clamp-2">
+                  <p className="text-gray-400 text-xs mb-3 leading-relaxed line-clamp-2">
                     {item.description}
                   </p>
                 </motion.div>
@@ -271,7 +274,7 @@ export default function WishlistPage() {
                   transition={{ delay: index * 0.1 + 1.7 }}
                   className="flex items-center justify-between"
                 >
-                  <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400">
+                  <div className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400">
                     {item.price}
                   </div>
                   
@@ -282,7 +285,7 @@ export default function WishlistPage() {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-5 py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-xl text-sm font-bold text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300 relative overflow-hidden group/btn"
+                      className="px-4 py-1.5 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-lg text-xs font-bold text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300 relative overflow-hidden group/btn"
                     >
                       <span className="relative z-10">✨ {t('viewProduct')}</span>
                       <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
@@ -323,6 +326,14 @@ export default function WishlistPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <a
+                href="https://paypal.me/sqrilizz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300"
+              >
+                💳 PayPal.me
+              </a>
+              <a
                 href="https://www.donationalerts.com/r/sqrilizz"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -338,6 +349,10 @@ export default function WishlistPage() {
               >
                 🚀 Boosty
               </a>
+              <div className="w-full mt-4 p-4 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-lg border border-gray-600/30">
+                <h4 className="text-sm font-semibold text-gray-300 mb-2">🏦 {t('bankDetails')}</h4>
+                <p className="text-xs text-gray-400">{t('bankDetailsDescription')}</p>
+              </div>
             </div>
           </div>
         </motion.div>

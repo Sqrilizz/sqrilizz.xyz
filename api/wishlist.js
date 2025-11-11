@@ -26,64 +26,84 @@ const KV_KEY = 'wishlist_data'
 const DEFAULT_DATA = {
   items: [
     {
-      id: 1,
-      title: "RTX 4090",
-      description: "Мощная видеокарта для разработки и игр",
-      price: "$1,599",
+      title: "Lenovo ThinkPad X13",
+      description: "AMD Ryzen 5 PRO 4650U - 2,10GHz | mälu 16 GB | kõvaketas 256 GB M.2 SSD | 13,3\" FHD IPS | klaviatuur - Eesti klahvistik valgustusega | a/c adapter | Windows 11 | ID-kaardilugeja | Garantii 6 kuud",
+      price: "250€",
       priority: "high",
       category: "hardware",
-      image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=300&fit=crop",
-      link: "https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/"
+      image: "https://www.bitboard.ee/9402-large_default/sulearvuti-lenovo-thinkpad-x13-gen-1.jpg",
+      link: "https://www.bitboard.ee/en/used-laptops/8574-sulearvuti-lenovo-thinkpad-x13-gen-1.html",
+      id: 1762701556068
     },
     {
-      id: 2,
-      title: "MacBook Pro M3 Max",
-      description: "Для мобильной разработки и дизайна",
-      price: "$3,999",
-      priority: "high",
-      category: "hardware",
-      image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=300&fit=crop",
-      link: "https://www.apple.com/macbook-pro/"
+      title: "Pop! Aki Hayakawa",
+      description: "It's time to tear up evil with Pop! Aki Hayakawa! Rev up your Chainsaw Man collection by making this Devil Hunter the next addition to your Anime lineup. Vinyl figure is approximately 4.65 in (11.8 cm) tall.",
+      price: "16€",
+      priority: "low",
+      category: "other",
+      image: "https://funko.com/dw/image/v2/BGTS_PRD/on/demandware.static/-/Sites-funko-master-catalog/default/dwa8a5dd35/images/funko/upload/80319_CSM_Aki_POP_GLAM-WEB.png?sw=800&sh=800",
+      link: "https://funko.com/ee/pop-aki-hayakawa/80319.html",
+      id: 1762701604280
     },
     {
-      id: 3,
-      title: "Steam Deck OLED",
-      description: "Портативная игровая консоль",
-      price: "$649",
+      title: "Metro 2033 Book",
+      description: "The Third World War wiped humanity off the face of the Earth. The planet has become desolate. Megacities turned to dust and ashes. Railroads rust. Satellites dangle lonely in orbit. Radio is silent on all frequencies. Only those who, upon...",
+      price: "25.59€",
       priority: "medium",
-      category: "gaming",
-      image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=300&fit=crop",
-      link: "https://store.steampowered.com/steamdeck"
+      category: "books",
+      image: "https://mnogoknig.com/storage/media/1042123/conversions/019309ed-7f84-771e-b1f0-a0d2fefe9174-large.webp",
+      link: "https://mnogoknig.com/en/products/272346/metro-2033",
+      id: 1762701650647
     },
     {
-      id: 4,
-      title: "Mechanical Keyboard",
-      description: "Кастомная механическая клавиатура",
-      price: "$299",
+      title: "Berserk Deluxe Volume 1",
+      description: "Have you got the Guts? Kentaro Miura´s Berserk has outraged, horrified, and delighted manga and anime fanatics since 1989, creating an international legion of hardcore devotees and inspiring a plethora of TV series, feature films, and video games. And now the badass champion of adult fantasy manga is presented in an oversized 7\" x 10\" deluxe hardcover edition, nearly 700 pages amassing the first three Berserk volumes, with following volumes to come to serve up the entire series in handsome bookshelf collections. No Guts, no glory!",
+      price: "42.95€",
+      priority: "low",
+      category: "books",
+      image: "https://www.apollo.ee/_next/image?url=https%3A%2F%2Fcdn.apollo.ee%2Fo%2Fapollo%2F3%2F2%2Ff%2F9%2F32f9f200496edbf8f172a9b5e2b9017b5d407011_9781506711980.jpg&w=256&q=75",
+      link: "https://www.apollo.ee/et/berserk-deluxe-volume-1.html",
+      id: 1762804628696
+    },
+    {
+      title: "Берсерк. Том 4",
+      description: "Бой за боем, победа за победой — и вот уже армия королевства Мидленд, в состав которой теперь входит и Отряд Соколов во главе с Гриффитом, начинает теснить неприятеля из империи Тюдоров. Но для окончательной победы в войне Мидленду необходимо вернуть...",
+      price: "31.29€",
+      priority: "low",
+      category: "books",
+      image: "https://mnogoknig.com/storage/media/980568/conversions/cover-(24)-large.webp",
+      link: "https://mnogoknig.com/ru/products/1236042/berserk-tom-4",
+      id: 1762804714892
+    },
+    {
+      title: "Metro Exodus Necklace",
+      description: "просто кулон из игры",
+      price: "3€",
+      priority: "high",
+      category: "other",
+      image: "https://ae-pic-a1.aliexpress-media.com/kf/S250e9252fd754ee0a0478ff657761f90J.jpg_220x220q75.jpg_.avif",
+      link: "https://surl.li/ytctcc",
+      id: 1762804917188
+    },
+    {
+      title: "Logitech G435 Lightspeed",
+      description: "juhtmevaba kõrvaklapid",
+      price: "51€",
       priority: "medium",
       category: "peripherals",
-      image: "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=300&fit=crop",
-      link: "#"
+      image: "https://gameroom.ee/55918/logitech-g435-lightspeed-must-juhtmevaba.jpg",
+      link: "https://gameroom.ee/et/juhtmeta-korvaklapid/products/logitech-g435-lightspeed-must-juhtmevaba-7816",
+      id: 1762805140567
     },
     {
-      id: 5,
-      title: "Studio Monitors",
-      description: "Профессиональные мониторы для звука",
-      price: "$599",
-      priority: "low",
-      category: "audio",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      link: "#"
-    },
-    {
-      id: 6,
-      title: "Drone DJI Mini 4 Pro",
-      description: "Для съемки видео и фотографии",
-      price: "$759",
-      priority: "low",
-      category: "photography",
-      image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&h=300&fit=crop",
-      link: "https://www.dji.com/mini-4-pro"
+      title: "LORGAR MSA10W",
+      description: "да",
+      price: "38€",
+      priority: "medium",
+      category: "peripherals",
+      image: "https://gameroom.ee/153579/lorgar-msa10w-optical-wireless-mouse-12000-dpi.jpg",
+      link: "https://gameroom.ee/et/juhtmevaba-hiir/products/lorgar-msa10w-optical-wireless-mouse-12000-dpi-24230",
+      id: 1762805277637
     }
   ],
   categories: {
