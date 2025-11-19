@@ -26,16 +26,26 @@ export default function ContactPage() {
     setIsSubmitting(true)
     
     try {
-      // Отправляем данные через защищенный API endpoint
-      const response = await fetch('/api/telegram', {
+      const telegramBotToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN
+      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID
+      
+      const message = `
+🔔 Новое сообщение с сайта!
+
+👤 Имя: ${formData.name}
+📧 Email: ${formData.email}
+💬 Сообщение: ${formData.message}
+      `
+      
+      const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML'
         })
       })
       
@@ -43,27 +53,11 @@ export default function ContactPage() {
         setSubmitStatus('success')
         setFormData({ name: '', email: '', message: '' })
       } else {
-        // В dev режиме показываем успех для тестирования UI
-        if (import.meta.env.DEV) {
-          console.log('DEV MODE: API not available, simulating success')
-          setSubmitStatus('success')
-          setFormData({ name: '', email: '', message: '' })
-        } else {
-          const errorData = await response.json().catch(() => ({}))
-          console.error('Error sending message:', errorData)
-          setSubmitStatus('error')
-        }
+        setSubmitStatus('error')
       }
     } catch (error) {
       console.error('Error:', error)
-      // В dev режиме показываем успех для тестирования UI
-      if (import.meta.env.DEV) {
-        console.log('DEV MODE: Network error, simulating success')
-        setSubmitStatus('success')
-        setFormData({ name: '', email: '', message: '' })
-      } else {
-        setSubmitStatus('error')
-      }
+      setSubmitStatus('error')
     }
     
     setIsSubmitting(false)
