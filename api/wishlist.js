@@ -2,8 +2,7 @@ import { Redis } from '@upstash/redis'
 
 // Инициализация Redis
 const getRedisUrl = () => {
-  const url = process.env.SqrilizzStorage_KV_REST_API_URL || 
-             process.env.sqrilizStorage_KV_REST_API_URL || 
+  const url = process.env.KV_REST_API_URL || 
              process.env.UPSTASH_REDIS_REST_URL
   // Убеждаемся что URL начинается с https://
   if (url && !url.startsWith('http')) {
@@ -14,8 +13,7 @@ const getRedisUrl = () => {
 
 const redis = new Redis({
   url: getRedisUrl(),
-  token: process.env.SqrilizzStorage_KV_REST_API_TOKEN || 
-         process.env.sqrilizStorage_KV_REST_API_TOKEN || 
+  token: process.env.KV_REST_API_TOKEN || 
          process.env.UPSTASH_REDIS_REST_TOKEN,
 })
 

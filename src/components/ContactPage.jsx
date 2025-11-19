@@ -26,27 +26,16 @@ export default function ContactPage() {
     setIsSubmitting(true)
     
     try {
-      // Отправляем данные в Telegram через bot API
-      const telegramBotToken = '8418261183:AAFyqbGEOGyflS5DD1Z6CTegnedUvwHdILE'
-      const chatId = '1611473093'
-      
-      const message = `
-🔔 Новое сообщение с сайта!
-
-👤 Имя: ${formData.name}
-📧 Email: ${formData.email}
-💬 Сообщение: ${formData.message}
-      `
-      
-      const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+      // Отправляем данные через защищенный API endpoint
+      const response = await fetch('/api/telegram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML'
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
         })
       })
       
@@ -54,10 +43,27 @@ export default function ContactPage() {
         setSubmitStatus('success')
         setFormData({ name: '', email: '', message: '' })
       } else {
-        setSubmitStatus('error')
+        // В dev режиме показываем успех для тестирования UI
+        if (import.meta.env.DEV) {
+          console.log('DEV MODE: API not available, simulating success')
+          setSubmitStatus('success')
+          setFormData({ name: '', email: '', message: '' })
+        } else {
+          const errorData = await response.json().catch(() => ({}))
+          console.error('Error sending message:', errorData)
+          setSubmitStatus('error')
+        }
       }
     } catch (error) {
-      setSubmitStatus('error')
+      console.error('Error:', error)
+      // В dev режиме показываем успех для тестирования UI
+      if (import.meta.env.DEV) {
+        console.log('DEV MODE: Network error, simulating success')
+        setSubmitStatus('success')
+        setFormData({ name: '', email: '', message: '' })
+      } else {
+        setSubmitStatus('error')
+      }
     }
     
     setIsSubmitting(false)
