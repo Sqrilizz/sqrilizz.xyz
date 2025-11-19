@@ -5,11 +5,11 @@ export function useLocalTime(timezone) {
   useEffect(() => {
     function update() {
       const now = new Date()
-      const s = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone: timezone })
+      const s = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: timezone })
       setTime(s)
     }
     update()
-    const id = setInterval(update, 60000)
+    const id = setInterval(update, 1000)
     return () => clearInterval(id)
   }, [timezone])
   return time

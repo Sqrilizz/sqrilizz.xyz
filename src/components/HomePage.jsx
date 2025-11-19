@@ -1,12 +1,12 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import ProfileCard from './ProfileCard'
 import TerminalCard from './TerminalCard'
 import MusicPlayer from './MusicPlayer'
 import DiscordRPC from './MottoCard'
 import LanguageSwitcher from './LanguageSwitcher'
-import TypewriterText from './TypewriterText'
 import StarField from './StarField'
 import FooterBanner from './FooterBanner'
+import WakaTimeBadge from './WakaTimeBadge'
 import { useLocalTime } from '../hooks/useLocalTime'
 import { MusicContext } from '../context/MusicContext'
 import { useTranslation } from 'react-i18next'
@@ -55,20 +55,9 @@ export default function HomePage() {
         <div className="md:col-span-2 flex flex-col gap-6">
           <TerminalCard user={USER}>
             <div>
-              <div className="mb-2">
-                <span className="text-violet-300">$</span> 
-                <TypewriterText 
-                  text={` ${t('aboutCommand')}`} 
-                  speed={80} 
-                  delay={1500}
-                />
-              </div>
-              <div className="mb-2">
-                <TypewriterText 
-                  text={t('aboutDescription')} 
-                  speed={50} 
-                  delay={3000}
-                />
+              <div className="mb-3">
+                <span className="text-green-400">$</span> 
+                <span className="text-gray-200"> {t('aboutCommand')}</span>
               </div>
 
               <pre className="bg-[#020214] p-3 rounded mt-3 text-sm">
@@ -87,8 +76,13 @@ export default function HomePage() {
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href="/wishlist">🎯 Wishlist</a>
               </div>
 
-              <div className="mt-6 text-sm text-gray-400">{t('musicPlaying')}: <span className="text-gray-200">{playlist[currentIndex]?.title || '—'}</span></div>
-              <div className="mt-6 text-xs text-gray-500">{t('localTime')} {time}</div>
+              {/* WakaTime Stats */}
+              <div className="mt-6">
+                <WakaTimeBadge />
+              </div>
+
+              <div className="mt-4 text-sm text-gray-400">{t('musicPlaying')}: <span className="text-gray-200">{playlist[currentIndex]?.title || '—'}</span></div>
+              <div className="mt-2 text-xs text-gray-500">{t('localTime')} {time}</div>
             </div>
           </TerminalCard>
 
