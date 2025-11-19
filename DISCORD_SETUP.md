@@ -1,146 +1,146 @@
-# 🎮 Настройка Discord RPC
+# 🎮 Discord RPC Setup
 
-Этот компонент показывает вашу реальную активность в Discord в режиме реального времени.
+This component displays your real-time Discord activity on your portfolio.
 
-## 🚀 Быстрая настройка
+## 🚀 Quick Setup
 
-### 1. Получите ваш Discord User ID
+### 1. Get Your Discord User ID
 
-1. Откройте Discord в браузере или приложении
-2. Включите **Developer Mode**:
-   - Настройки → Расширенные → Режим разработчика ✅
-3. Щелкните правой кнопкой на свой профиль
-4. Выберите **"Скопировать ID пользователя"**
-5. Вставьте ID в `src/config/discord.js`:
+1. Open Discord in browser or app
+2. Enable **Developer Mode**:
+   - Settings → Advanced → Developer Mode ✅
+3. Right-click on your profile
+4. Select **"Copy User ID"**
+5. Paste the ID in `src/config/discord.js`:
 
 ```javascript
 export const DISCORD_CONFIG = {
-  USER_ID: 'ВАШ_DISCORD_ID_ЗДЕСЬ', // Замените на ваш реальный ID
+  USER_ID: 'YOUR_DISCORD_ID_HERE', // Replace with your actual ID
   // ...
 }
 ```
 
-### 2. Настройте Lanyard (Рекомендуется)
+### 2. Setup Lanyard (Recommended)
 
-**Lanyard** - это бесплатный сервис для получения Discord активности:
+**Lanyard** is a free service for fetching Discord activity:
 
-1. Присоединитесь к Discord серверу: https://discord.gg/lanyard
-2. Ваша активность автоматически станет доступна через API
-3. Никаких дополнительных настроек не требуется!
+1. Join the Discord server: https://discord.gg/lanyard
+2. Your activity will automatically become available via API
+3. No additional configuration required!
 
-**API endpoint:** `https://api.lanyard.rest/v1/users/ВАШ_ID`
+**API endpoint:** `https://api.lanyard.rest/v1/users/YOUR_ID`
 
-### 3. Альтернативный способ - Discord Bot (Продвинутый)
+### 3. Alternative Method - Discord Bot (Advanced)
 
-Если хотите больше контроля, создайте Discord бота:
+If you want more control, create a Discord bot:
 
-1. Идите на https://discord.com/developers/applications
-2. Создайте новое приложение
-3. Во вкладке **Bot** создайте бота
-4. Скопируйте токен бота
-5. Добавьте бота на ваш сервер с правами `Read Messages`
+1. Go to https://discord.com/developers/applications
+2. Create a new application
+3. In the **Bot** tab, create a bot
+4. Copy the bot token
+5. Add the bot to your server with `Read Messages` permissions
 
-⚠️ **ВАЖНО:** Никогда не публикуйте токен бота в открытом коде!
+⚠️ **IMPORTANT:** Never publish your bot token in public code!
 
-## 🎯 Что отображается
+## 🎯 What's Displayed
 
-### 📱 Статусы
-- 🟢 **Online** - активен
-- 🟡 **Idle** - отошел
-- 🔴 **DND** - не беспокоить
-- ⚫ **Offline** - не в сети
+### 📱 Status
+- 🟢 **Online** - active
+- 🟡 **Idle** - away
+- 🔴 **DND** - do not disturb
+- ⚫ **Offline** - not online
 
-### 🎮 Активности
-- **Игры** - что играете
-- **VS Code** - над чем работаете
-- **Spotify** - что слушаете
-- **Другие приложения** - браузер, программы
+### 🎮 Activities
+- **Games** - what you're playing
+- **VS Code** - what you're working on
+- **Spotify** - what you're listening to
+- **Other apps** - browser, programs
 
-### 🎵 Spotify интеграция
-Автоматически показывает:
-- 🎵 Название трека
-- 👨‍🎤 Исполнитель
-- 💿 Альбом
+### 🎵 Spotify Integration
+Automatically shows:
+- 🎵 Track name
+- 👨‍🎤 Artist
+- 💿 Album
 
-## 🔧 Настройка компонента
+## 🔧 Component Configuration
 
-В `src/components/MottoCard.jsx` измените User ID:
+In `src/components/MottoCard.jsx` change the User ID:
 
 ```javascript
-// Строка 37
-ws = new LanyardWebSocket('ВАШ_DISCORD_ID', (data) => {
+// Line 37
+ws = new LanyardWebSocket('YOUR_DISCORD_ID', (data) => {
   // ...
 })
 ```
 
-## 🌐 Real-time обновления
+## 🌐 Real-time Updates
 
-Компонент поддерживает два режима:
+The component supports two modes:
 
-### WebSocket (Рекомендуется)
-- Мгновенные обновления
-- Минимальная нагрузка на API
-- Автоматическое переподключение
+### WebSocket (Recommended)
+- Instant updates
+- Minimal API load
+- Automatic reconnection
 
 ### HTTP Polling (Fallback)
-- Обновления каждые 30 секунд
-- Работает если WebSocket недоступен
-- Более стабильно на некоторых хостингах
+- Updates every 30 seconds
+- Works if WebSocket is unavailable
+- More stable on some hosting providers
 
-## 🎨 Кастомизация
+## 🎨 Customization
 
-### Изменить приоритет активностей
-В `src/config/discord.js`:
+### Change Activity Priority
+In `src/config/discord.js`:
 
 ```javascript
 const priorities = {
   'Custom Status': 1,
   'Spotify': 5,
   'Visual Studio Code': 4,
-  'Ваше приложение': 3
+  'Your App': 3
 }
 ```
 
-### Добавить новые иконки
-В компоненте `DiscordRPC`:
+### Add New Icons
+In the `DiscordRPC` component:
 
 ```javascript
-{mainActivity.name === 'Ваше приложение' ? (
-  <svg><!-- Ваша иконка --></svg>
+{mainActivity.name === 'Your App' ? (
+  <svg><!-- Your icon --></svg>
 ) : (
-  // Стандартная иконка
+  // Default icon
 )}
 ```
 
-## 🐛 Устранение проблем
+## 🐛 Troubleshooting
 
-### Не загружается активность
-1. Проверьте правильность Discord ID
-2. Убедитесь что присоединились к Lanyard серверу
-3. Проверьте консоль браузера на ошибки
+### Activity Not Loading
+1. Check if Discord ID is correct
+2. Make sure you joined the Lanyard server
+3. Check browser console for errors
 
-### WebSocket не подключается
-- Проверьте блокировщики рекламы
-- Некоторые корпоративные сети блокируют WebSocket
-- Компонент автоматически переключится на HTTP polling
+### WebSocket Not Connecting
+- Check ad blockers
+- Some corporate networks block WebSocket
+- Component will automatically switch to HTTP polling
 
-### Показывает "Offline" когда вы онлайн
-- Подождите 1-2 минуты для синхронизации
-- Перезагрузите страницу
-- Проверьте настройки приватности Discord
+### Shows "Offline" When You're Online
+- Wait 1-2 minutes for synchronization
+- Reload the page
+- Check Discord privacy settings
 
-## 📊 Производительность
+## 📊 Performance
 
-- **Размер:** ~3KB дополнительного кода
-- **API запросы:** 1 раз в 30 секунд (HTTP) или real-time (WS)
-- **Влияние на загрузку:** минимальное
+- **Size:** ~3KB additional code
+- **API requests:** Once per 30 seconds (HTTP) or real-time (WS)
+- **Load impact:** minimal
 
-## 🔒 Приватность
+## 🔒 Privacy
 
-- Показывается только публичная активность Discord
-- Никаких личных данных не передается
-- Работает через официальные Discord API
+- Only public Discord activity is shown
+- No personal data is transmitted
+- Works through official Discord APIs
 
 ---
 
-**🎉 Готово!** Теперь ваше портфолио показывает реальную активность в Discord!
+**🎉 Done!** Your portfolio now shows real-time Discord activity!

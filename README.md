@@ -1,7 +1,7 @@
 # 🚀 Sqrilizz Portfolio
 
 <div align="center">
-  <h3>Современное интерактивное портфолио разработчика</h3>
+  <h3>Modern Interactive Developer Portfolio</h3>
   <p><strong>React + Vite + Tailwind CSS + Framer Motion</strong></p>
 
   ![Portfolio Preview](https://img.shields.io/badge/Status-Active-brightgreen)
@@ -9,143 +9,154 @@
   ![Vite](https://img.shields.io/badge/Vite-4.4.5-646CFF)
   ![Tailwind](https://img.shields.io/badge/Tailwind-3.3.0-38B2AC)
 
-  **🌐 [Посмотреть демо](https://sqrilizz.xyz)** |
-  **📧 [Связаться со мной](mailto:contact@sqrlizz.xyz)**
+  **🌐 [View Demo](https://sqrilizz.xyz)** |
+  **📧 [Contact Me](mailto:contact@sqrlizz.xyz)**
 
 </div>
 
 ---
 
-## ✨ Особенности
+## ✨ Features
 
-### 🎨 **Современный дизайн**
-- Темная тема с фиолетовыми градиентами
-- Анимированное звездное поле на фоне
-- Стеклянный эффект карточек с размытием
+### 🎨 **Modern Design**
+- Dark theme with purple gradients
+- Animated starfield background
+- Glass-morphism card effects with blur
 
-### 🎵 **Интерактивный музыкальный плеер**
-- Воспроизведение MP3 файлов с обложками
-- Визуализация эквалайзера с анимацией
-- Управление громкостью и прогрессом
+### 🎵 **Interactive Music Player**
+- MP3 playback with album covers
+- Animated equalizer visualization
+- Volume and progress controls
 
-### 💬 **Терминальный интерфейс**
-- Стиль VS Code с анимированным курсором
-- Typing-эффект для текста
-- Многоязычность (Русский/Английский)
+### 💬 **Terminal Interface**
+- VS Code style with animated cursor
+- Typing effect for text
+- Multi-language support (Russian/English)
 
-### 🌍 **Адаптивность**
-- Полностью responsive дизайн
-- Поддержка мобильных устройств
-- Современные веб-стандарты
+### 🎮 **Discord Rich Presence**
+- Real-time Discord activity display
+- Shows what you're playing, coding, or listening to
+- Spotify integration with live track info
+- WebSocket for instant updates
 
-## 🚀 Быстрый старт
+### 🌍 **Responsive**
+- Fully responsive design
+- Mobile device support
+- Modern web standards
 
-### Предварительные требования
+## 🚀 Quick Start
+
+### Prerequisites
 - Node.js 16+
-- npm или yarn
+- npm or yarn
 
-### Установка
+### Installation
 
 ```bash
-# Клонировать репозиторий
+# Clone the repository
 git clone https://github.com/Sqrilizz/ZovNew.git
 cd ZovNew
 
-# Установить зависимости
+# Install dependencies
 npm install
 
-# Запустить в режиме разработки
+# Run in development mode
 npm run dev
 
-# Собрать для продакшена
+# Build for production
 npm run build
 ```
 
-Откройте [http://localhost:5173](http://localhost:5173) в браузере!
+Open [http://localhost:5173](http://localhost:5173) in your browser!
 
-## 🛠 Кастомизация
+## 🛠 Customization
 
-### 1. **Персональная информация**
-Отредактируйте `src/components/HomePage.jsx`:
+### 1. **Personal Information**
+Edit `src/components/HomePage.jsx`:
 ```javascript
 const USER = {
   nick: 'Sqrilizz',
   role: 'Developer, Minecraft Modder, Web Designer & AI Engineer',
   location: { country: 'Estonia', city: 'Tallinn' },
-  // ... ваши социальные сети
+  // ... your social links
 }
 ```
 
-### 2. **Музыкальный плейлист**
-Добавьте MP3 файлы в `public/music/` и настройте в `src/components/HomePage.jsx`:
+### 2. **Music Playlist**
+Add MP3 files to `public/music/` and configure in `src/components/HomePage.jsx`:
 ```javascript
 const playlist = [
   {
-    title: 'Название трека',
+    title: 'Track Name',
     src: '/music/track.mp3',
     cover: '/music/covers/cover.jpg'
   }
 ]
 ```
 
-### 3. **Видео страницы**
-Настройте секретные видео в `src/config/videos.js`:
+### 3. **Discord Activity**
+See [DISCORD_SETUP.md](DISCORD_SETUP.md) for detailed instructions on setting up Discord Rich Presence integration.
+
+### 4. **Video Pages**
+Configure secret videos in `src/config/videos.js`:
 ```javascript
 export const VIDEO_CONFIG = {
   'Important': 'https://youtube.com/embed/...',
   'Secret': '/videos/secret.mp4'
 }
 ```
-Доступ: `yoursite.com/Important`, `yoursite.com/Secret`
+Access: `yoursite.com/Important`, `yoursite.com/Secret`
 
-### 4. **Изображения**
-- `public/avatar.png` - ваш аватар (квадратный)
-- `public/favicon.ico` - иконка сайта
-- `public/banner.jpg` - фоновый баннер
+### 5. **Images**
+- `public/avatar.png` - your avatar (square)
+- `public/favicon.ico` - site icon
+- `public/banner.jpg` - background banner
 
-## 📁 Структура проекта
+## 📁 Project Structure
 
 ```
 src/
-├── components/          # React компоненты
-│   ├── HomePage.jsx    # Главная страница
-│   ├── ProfileCard.jsx # Карточка профиля
-│   ├── MusicPlayer.jsx # Музыкальный плеер
-│   ├── TerminalCard.jsx# Терминальный интерфейс
-│   └── MottoCard.jsx   # Карточка с девизом
-├── context/            # React контексты
-├── hooks/              # Кастомные хуки
-├── locales/            # Переводы (RU/EN)
-├── utils/              # Утилиты
-└── config/             # Конфигурации
+├── components/          # React components
+│   ├── HomePage.jsx    # Main page
+│   ├── ProfileCard.jsx # Profile card
+│   ├── MusicPlayer.jsx # Music player
+│   ├── TerminalCard.jsx# Terminal interface
+│   └── MottoCard.jsx   # Discord RPC card
+├── context/            # React contexts
+├── hooks/              # Custom hooks
+├── locales/            # Translations (RU/EN)
+├── utils/              # Utilities
+└── config/             # Configurations
+    └── discord.js      # Discord API config
 
 public/
-├── music/              # MP3 файлы и обложки
-├── videos/             # Локальные видео
-└── images/             # Дополнительные изображения
+├── music/              # MP3 files and covers
+├── videos/             # Local videos
+└── images/             # Additional images
 ```
 
-## 🛠 Технологии
+## 🛠 Technologies
 
-- **React 18** - современный фреймворк
-- **Vite** - быстрый bundler и dev server
-- **Tailwind CSS** - утилитарный CSS фреймворк
-- **Framer Motion** - анимации и переходы
-- **Howler.js** - работа со звуком
-- **React i18next** - интернационализация
-- **React Icons** - красивые иконки
+- **React 18** - modern framework
+- **Vite** - fast bundler and dev server
+- **Tailwind CSS** - utility-first CSS framework
+- **Framer Motion** - animations and transitions
+- **Howler.js** - audio handling
+- **React i18next** - internationalization
+- **React Icons** - beautiful icons
+- **Lanyard API** - Discord Rich Presence integration
 
-## 📊 Мониторинг
+## 📊 Stats
 
 [![GitHub issues](https://img.shields.io/github/issues/Sqrilizz/ZovNew)](https://github.com/Sqrilizz/ZovNew/issues)
 [![GitHub stars](https://img.shields.io/github/stars/Sqrilizz/ZovNew)](https://github.com/Sqrilizz/ZovNew/stargazers)
 [![GitHub license](https://img.shields.io/github/license/Sqrilizz/ZovNew)](https://github.com/Sqrilizz/ZovNew/blob/master/LICENSE)
 
-## 📝 Лицензия
+## 📝 License
 
-Этот проект лицензирован под [MIT License](LICENSE) - свободно используйте для своих портфолио!
+This project is licensed under the [MIT License](LICENSE) - feel free to use it for your own portfolio!
 
-## 🤝 Контакты
+## 🤝 Contact
 
 **Sqrilizz** - Developer & Creator
 
@@ -157,5 +168,5 @@ public/
 ---
 
 <div align="center">
-  <strong>⭐ Не забудьте поставить звездочку если проект понравился!</strong>
+  <strong>⭐ Don't forget to star the repo if you like it!</strong>
 </div>
