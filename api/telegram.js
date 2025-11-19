@@ -2,12 +2,23 @@
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID
 
-// Разрешённые источники для CORS
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000').split(',')
-
 // Функция для проверки CORS
 const checkCORS = (origin) => {
-  return ALLOWED_ORIGINS.includes(origin)
+  if (!origin) return false
+  
+  // Разрешаем localhost для разработки
+  if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    return true
+  }
+  
+  // Разрешаем Vercel preview и production домены
+  if (origin.includes('vercel.app') || origin.includes('sqrlizz.xyz')) {
+    return true
+  }
+  
+  // Проверяем дополнительные разрешенные домены из env
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
+  return allowedOrigins.some(allowed => origin.includes(allowed.trim()))
 }
 
 // Функция для валидации данных формы
