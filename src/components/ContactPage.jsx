@@ -26,34 +26,27 @@ export default function ContactPage() {
     setIsSubmitting(true)
     
     try {
-      const telegramBotToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN
-      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID
-      
-      const message = `
-🔔 Новое сообщение с сайта!
-
-👤 Имя: ${formData.name}
-📧 Email: ${formData.email}
-💬 Сообщение: ${formData.message}
-      `
-      
-      const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+      // Отправляем через защищенный API endpoint
+      const response = await fetch('/api/send-telegram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML'
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
         })
       })
       
-      if (response.ok) {
+      const data = await response.json()
+      
+      if (response.ok && data.success) {
         setSubmitStatus('success')
         setFormData({ name: '', email: '', message: '' })
       } else {
         setSubmitStatus('error')
+        console.error('Error:', data.error)
       }
     } catch (error) {
       console.error('Error:', error)
