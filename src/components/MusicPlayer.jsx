@@ -37,6 +37,7 @@ export default function MusicPlayer() {
       if (videoRef.current) {
         videoRef.current.src = src
         videoRef.current.volume = volume
+        videoRef.current.load() // Принудительная загрузка
         videoRef.current.onloadedmetadata = () => {
           setDuration(videoRef.current.duration)
         }
@@ -80,21 +81,24 @@ export default function MusicPlayer() {
   }
 
   const toggle = () => {
+    console.log('Toggle clicked, isVideo:', isVideo, 'playing:', playing)
     if (isVideo && videoRef.current) {
       if (playing) {
         videoRef.current.pause()
         setPlaying(false)
         cancelAnimationFrame(rafRef.current)
       } else {
+        console.log('Attempting to play video...')
         const playPromise = videoRef.current.play()
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
+              console.log('Video playing successfully')
               setPlaying(true)
               rafRef.current = requestAnimationFrame(tick)
             })
             .catch((error) => {
-              console.log('Video play failed:', error)
+              console.error('Video play failed:', error)
             })
         }
       }
