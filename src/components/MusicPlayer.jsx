@@ -40,19 +40,15 @@ export default function MusicPlayer() {
         videoRef.current.load() // Принудительная загрузка
         
         const updateDuration = () => {
-          if (videoRef.current && videoRef.current.duration) {
+          if (videoRef.current && videoRef.current.duration && isFinite(videoRef.current.duration)) {
+            console.log('Setting duration:', videoRef.current.duration)
             setDuration(videoRef.current.duration)
           }
         }
         
-        videoRef.current.onloadedmetadata = updateDuration
-        videoRef.current.ondurationchange = updateDuration
-        videoRef.current.oncanplay = updateDuration
-        
-        // Если duration уже доступна
-        if (videoRef.current.duration) {
-          setDuration(videoRef.current.duration)
-        }
+        videoRef.current.addEventListener('loadedmetadata', updateDuration)
+        videoRef.current.addEventListener('durationchange', updateDuration)
+        videoRef.current.addEventListener('canplay', updateDuration)
       }
     } else {
       // Используем Howler для аудио
@@ -84,12 +80,16 @@ export default function MusicPlayer() {
   }, [volume, isVideo])
 
   const tick = () => {
-    if (isVideo && videoRef.current && !videoRef.current.paused) {
+    if (isVideo && videoRef.current) {
       setPos(videoRef.current.currentTime || 0)
-      rafRef.current = requestAnimationFrame(tick)
-    } else if (soundRef.current && !soundRef.current.paused) {
+      if (!videoRef.current.paused && !videoRef.current.ended) {
+        rafRef.current = requestAnimationFrame(tick)
+      }
+    } else if (soundRef.current) {
       setPos(soundRef.current.seek() || 0)
-      rafRef.current = requestAnimationFrame(tick)
+      if (!soundRef.current.paused) {
+        rafRef.current = requestAnimationFrame(tick)
+      }
     }
   }
 
