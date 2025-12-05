@@ -86,9 +86,17 @@ export default function MusicPlayer() {
         setPlaying(false)
         cancelAnimationFrame(rafRef.current)
       } else {
-        videoRef.current.play()
-        setPlaying(true)
-        rafRef.current = requestAnimationFrame(tick)
+        const playPromise = videoRef.current.play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setPlaying(true)
+              rafRef.current = requestAnimationFrame(tick)
+            })
+            .catch((error) => {
+              console.log('Video play failed:', error)
+            })
+        }
       }
     } else if (soundRef.current) {
       if (playing) {
