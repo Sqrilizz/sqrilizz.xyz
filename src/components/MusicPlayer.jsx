@@ -35,7 +35,6 @@ export default function MusicPlayer() {
     if (isVideoFile) {
       // Используем HTML5 video для видео
       if (videoRef.current) {
-        videoRef.current.src = src
         videoRef.current.volume = volume
         videoRef.current.load() // Принудительная загрузка
         
@@ -176,6 +175,7 @@ export default function MusicPlayer() {
           {/* Видео */}
           <video
             ref={videoRef}
+            src={currentTrack.src}
             className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
             loop
             playsInline
