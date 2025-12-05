@@ -36,18 +36,6 @@ export default function MusicPlayer() {
       // Используем HTML5 video для видео
       if (videoRef.current) {
         videoRef.current.volume = volume
-        videoRef.current.load() // Принудительная загрузка
-        
-        const updateDuration = () => {
-          if (videoRef.current && videoRef.current.duration && isFinite(videoRef.current.duration)) {
-            console.log('Setting duration:', videoRef.current.duration)
-            setDuration(videoRef.current.duration)
-          }
-        }
-        
-        videoRef.current.addEventListener('loadedmetadata', updateDuration)
-        videoRef.current.addEventListener('durationchange', updateDuration)
-        videoRef.current.addEventListener('canplay', updateDuration)
       }
     } else {
       // Используем Howler для аудио
@@ -181,6 +169,20 @@ export default function MusicPlayer() {
             playsInline
             crossOrigin="anonymous"
             preload="metadata"
+            onLoadedMetadata={(e) => {
+              const dur = e.target.duration
+              if (dur && isFinite(dur)) {
+                console.log('Duration set:', dur)
+                setDuration(dur)
+              }
+            }}
+            onDurationChange={(e) => {
+              const dur = e.target.duration
+              if (dur && isFinite(dur)) {
+                console.log('Duration changed:', dur)
+                setDuration(dur)
+              }
+            }}
           />
           {/* Легкий градиент для читаемости текста */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
