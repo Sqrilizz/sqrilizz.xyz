@@ -40,13 +40,6 @@ export default function MusicPlayer() {
         videoRef.current.load() // Принудительная загрузка
         videoRef.current.onloadedmetadata = () => {
           setDuration(videoRef.current.duration)
-          console.log('Video metadata loaded, duration:', videoRef.current.duration)
-        }
-        videoRef.current.oncanplay = () => {
-          console.log('Video can play now')
-        }
-        videoRef.current.onerror = (e) => {
-          console.error('Video error:', e)
         }
       }
     } else {
