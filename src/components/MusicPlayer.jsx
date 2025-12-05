@@ -40,6 +40,13 @@ export default function MusicPlayer() {
         videoRef.current.load() // Принудительная загрузка
         videoRef.current.onloadedmetadata = () => {
           setDuration(videoRef.current.duration)
+          console.log('Video metadata loaded, duration:', videoRef.current.duration)
+        }
+        videoRef.current.oncanplay = () => {
+          console.log('Video can play now')
+        }
+        videoRef.current.onerror = (e) => {
+          console.error('Video error:', e)
         }
       }
     } else {
@@ -170,7 +177,10 @@ export default function MusicPlayer() {
             loop
             playsInline
             crossOrigin="anonymous"
-          />
+            preload="auto"
+          >
+            <source src={currentTrack.src} type="video/mp4" />
+          </video>
           {/* Легкий градиент для читаемости текста */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
         </>
