@@ -80,7 +80,7 @@ export default function MusicPlayer() {
     rafRef.current = requestAnimationFrame(tick)
   }
 
-  const toggle = () => {
+  const toggle = async () => {
     console.log('Toggle clicked, isVideo:', isVideo, 'playing:', playing)
     if (isVideo && videoRef.current) {
       if (playing) {
@@ -88,18 +88,14 @@ export default function MusicPlayer() {
         setPlaying(false)
         cancelAnimationFrame(rafRef.current)
       } else {
-        console.log('Attempting to play video...')
-        const playPromise = videoRef.current.play()
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('Video playing successfully')
-              setPlaying(true)
-              rafRef.current = requestAnimationFrame(tick)
-            })
-            .catch((error) => {
-              console.error('Video play failed:', error)
-            })
+        try {
+          console.log('Attempting to play video...')
+          await videoRef.current.play()
+          console.log('Video playing successfully')
+          setPlaying(true)
+          rafRef.current = requestAnimationFrame(tick)
+        } catch (error) {
+          console.error('Video play failed:', error)
         }
       }
     } else if (soundRef.current) {
@@ -172,7 +168,8 @@ export default function MusicPlayer() {
             ref={videoRef}
             className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
             loop
-            muted={false}
+            playsInline
+            crossOrigin="anonymous"
           />
           {/* Легкий градиент для читаемости текста */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
