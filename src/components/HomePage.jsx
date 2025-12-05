@@ -33,7 +33,7 @@ export default function HomePage() {
   // Загружаем музыку при первом запуске
   useEffect(() => {
     const playlist = [
-      { title: 'XANAKIN SKYWOK - LOVESHOTS', src: '/music/piska.mp4', type: 'video', cover: '/music/covers/static.png' },
+      { title: 'XANAKIN SKYWOK - LOVESHOTS', src: 'https://res.cloudinary.com/dvlqxgfaz/video/upload/v1764958666/piska_i3vgze.mp4', type: 'video', cover: '/music/covers/static.png' },
       // Добавьте больше треков здесь:
       // { title: 'Track 2', src: '/music/track2.mp3', cover: '/music/covers/track2.jpg' },
     ]
