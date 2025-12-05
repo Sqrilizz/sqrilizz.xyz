@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { MusicProvider } from './context/MusicContext'
 import HomePage from './components/HomePage'
+import ProjectsPage from './components/ProjectsPage'
 import VideoPage from './components/VideoPage'
 import ContactPage from './components/ContactPage'
 import WishlistPage from './components/WishlistPage'
@@ -14,6 +15,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/admin/wishlist" element={<WishlistAdmin />} />

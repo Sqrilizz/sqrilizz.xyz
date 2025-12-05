@@ -6,27 +6,56 @@ import { formatTime } from '../utils/formatTime'
 export default function MusicPlayer() {
   const { playlist, currentIndex, setCurrentIndex } = useContext(MusicContext)
   const soundRef = useRef(null)
+  const videoRef = useRef(null)
   const [playing, setPlaying] = useState(false)
   const [pos, setPos] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(0.1) // Громкость по умолчанию 10%
+  const [isVideo, setIsVideo] = useState(false)
   const rafRef = useRef(null)
 
   useEffect(() => {
     // when currentIndex changes, load new track
     if (currentIndex == null || !playlist[currentIndex]) return
-    if (soundRef.current) soundRef.current.unload()
-    const src = playlist[currentIndex].src
-    soundRef.current = new Howl({ 
-      src: [src], 
-      html5: true, 
-      volume: volume,
-      onload: () => setDuration(soundRef.current.duration()) 
-    })
+    
+    const currentTrack = playlist[currentIndex]
+    const src = currentTrack.src
+    const isVideoFile = src.endsWith('.mp4') || src.endsWith('.webm') || currentTrack.type === 'video'
+    
+    setIsVideo(isVideoFile)
     setPlaying(false)
     setPos(0)
-    return () => { if (soundRef.current) soundRef.current.unload() }
-  }, [currentIndex, playlist, volume])
+    
+    // Очищаем предыдущий медиа
+    if (soundRef.current) {
+      soundRef.current.unload()
+      soundRef.current = null
+    }
+    
+    if (isVideoFile) {
+      // Используем HTML5 video для видео
+      if (videoRef.current) {
+        videoRef.current.src = src
+        videoRef.current.volume = volume
+        videoRef.current.onloadedmetadata = () => {
+          setDuration(videoRef.current.duration)
+        }
+      }
+    } else {
+      // Используем Howler для аудио
+      soundRef.current = new Howl({ 
+        src: [src], 
+        html5: true, 
+        volume: volume,
+        onload: () => setDuration(soundRef.current.duration()) 
+      })
+    }
+    
+    return () => { 
+      if (soundRef.current) soundRef.current.unload()
+      if (videoRef.current) videoRef.current.pause()
+    }
+  }, [currentIndex, playlist]) // Убрали volume из зависимостей!
 
   useEffect(() => {
     return () => cancelAnimationFrame(rafRef.current)
@@ -34,33 +63,59 @@ export default function MusicPlayer() {
 
   // Обновляем громкость при изменении
   useEffect(() => {
-    if (soundRef.current) {
+    if (isVideo && videoRef.current) {
+      videoRef.current.volume = volume
+    } else if (soundRef.current) {
       soundRef.current.volume(volume)
     }
-  }, [volume])
+  }, [volume, isVideo])
 
   const tick = () => {
-    if (!soundRef.current) return
-    const s = soundRef.current.seek() || 0
-    setPos(s)
+    if (isVideo && videoRef.current) {
+      setPos(videoRef.current.currentTime || 0)
+    } else if (soundRef.current) {
+      setPos(soundRef.current.seek() || 0)
+    }
     rafRef.current = requestAnimationFrame(tick)
   }
 
   const toggle = () => {
-    if (!soundRef.current) return
-    if (playing) {
-      soundRef.current.pause(); setPlaying(false); cancelAnimationFrame(rafRef.current)
-    } else {
-      soundRef.current.play(); setPlaying(true); rafRef.current = requestAnimationFrame(tick)
+    if (isVideo && videoRef.current) {
+      if (playing) {
+        videoRef.current.pause()
+        setPlaying(false)
+        cancelAnimationFrame(rafRef.current)
+      } else {
+        videoRef.current.play()
+        setPlaying(true)
+        rafRef.current = requestAnimationFrame(tick)
+      }
+    } else if (soundRef.current) {
+      if (playing) {
+        soundRef.current.pause()
+        setPlaying(false)
+        cancelAnimationFrame(rafRef.current)
+      } else {
+        soundRef.current.play()
+        setPlaying(true)
+        rafRef.current = requestAnimationFrame(tick)
+      }
     }
   }
 
   const seek = (e) => {
-    if (!soundRef.current) return
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left; const pct = Math.max(0, Math.min(1, x / rect.width))
-    soundRef.current.seek(pct * duration)
-    setPos(pct * duration)
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const pct = Math.max(0, Math.min(1, x / rect.width))
+    const newTime = pct * duration
+    
+    if (isVideo && videoRef.current) {
+      videoRef.current.currentTime = newTime
+      setPos(newTime)
+    } else if (soundRef.current) {
+      soundRef.current.seek(newTime)
+      setPos(newTime)
+    }
   }
 
   const changeVolume = (e) => {
@@ -90,15 +145,38 @@ export default function MusicPlayer() {
 
   return (
     <div className="card relative overflow-hidden">
-      {/* Фоновое изображение */}
-      {currentTrack?.cover && (
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-60 pointer-events-none"
-          style={{ backgroundImage: `url(${currentTrack.cover})` }}
-        />
+      {/* Видео или фоновое изображение */}
+      {isVideo ? (
+        <>
+          {/* Статичный баннер когда видео не играет */}
+          {!playing && currentTrack?.cover && (
+            <div
+              className="absolute inset-0 bg-cover bg-center pointer-events-none"
+              style={{ backgroundImage: `url(${currentTrack.cover})` }}
+            />
+          )}
+          {/* Видео */}
+          <video
+            ref={videoRef}
+            className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
+            loop
+            muted={false}
+          />
+          {/* Легкий градиент для читаемости текста */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
+        </>
+      ) : currentTrack?.cover ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-60 pointer-events-none"
+            style={{ backgroundImage: `url(${currentTrack.cover})` }}
+          />
+          {/* Фоновый градиент */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-950/60 to-violet-950/60 pointer-events-none" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-950/60 to-violet-950/60 pointer-events-none" />
       )}
-      {/* Фоновый градиент */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-950/60 to-violet-950/60 pointer-events-none" />
       
       {/* Информация о треке с кнопкой play */}
       <div className="flex items-center gap-4 mb-4">

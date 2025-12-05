@@ -1,8 +1,11 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import TypewriterText from './TypewriterText'
+import { useDiscordAvatar } from '../hooks/useDiscordAvatar'
 
 export default function ProfileCard({ user }) {
+  const { avatarUrl, loading } = useDiscordAvatar(128)
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 8 }} 
@@ -14,17 +17,27 @@ export default function ProfileCard({ user }) {
       <div className="flex items-center gap-4">
         <div className="relative">
           <div className="w-24 h-24 bg-[rgba(255,255,255,0.02)] flex items-center justify-center text-xl font-semibold overflow-hidden rounded-xl">
-            {/* Замени '/avatar.png' на путь к своему аватару */}
-            <img 
-              src="https://cdn.discordapp.com/avatars/1401591841115078862/fd0db874af9a33b695c143223e7928f0.png?size=128" 
-              alt="sqrilizz"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.style.display = 'none'
-                e.target.nextSibling.style.display = 'flex'
-              }}
-            />
-            <span className="hidden w-full h-full flex items-center justify-center">{user.nick.charAt(0).toUpperCase()}</span>
+            {loading ? (
+              // Показываем плейсхолдер во время загрузки
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-violet-600/20">
+                <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : avatarUrl ? (
+              // Показываем аватар из Discord
+              <img 
+                src={avatarUrl} 
+                alt={user.nick}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
+              />
+            ) : null}
+            {/* Фоллбэк - первая буква ника */}
+            <span className={`${loading || avatarUrl ? 'hidden' : 'flex'} w-full h-full items-center justify-center bg-gradient-to-br from-purple-500 to-violet-600 text-white text-3xl font-bold`}>
+              {user.nick.charAt(0).toUpperCase()}
+            </span>
           </div>
           {/* Желтая луна статус */}
           <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full border-2 border-[rgba(14,16,29,0.95)] flex items-center justify-center animate-pulse shadow-lg shadow-yellow-400/30">
@@ -45,7 +58,7 @@ export default function ProfileCard({ user }) {
         </div>
       </div>
 
-      <div className="mt-4 border-t border-[rgba(124,58,237,0.08)] pt-4 flex gap-3">
+      <div className="mt-4 border-t border-[rgba(124,58,237,0.08)] pt-4 pb-2.5 flex gap-3">
         <a className="w-10 h-10 rounded-full flex items-center justify-center bg-[rgba(90,89,185,0.12)] hover:bg-[rgba(90,89,185,0.2)] transition-colors" href={user.socials.telegram} target="_blank" rel="noreferrer" title="Telegram">
           <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
@@ -53,10 +66,10 @@ export default function ProfileCard({ user }) {
         </a>
         <button 
           className="w-10 h-10 rounded-full flex items-center justify-center bg-[rgba(90,89,185,0.12)] hover:bg-[rgba(90,89,185,0.2)] transition-colors group relative" 
-          onClick={() => {
+          onClick={(e) => {
             navigator.clipboard.writeText('sqrilizz')
             // Показать уведомление
-            const btn = event.currentTarget
+            const btn = e.currentTarget
             const tooltip = btn.querySelector('.tooltip')
             tooltip.classList.remove('opacity-0')
             setTimeout(() => tooltip.classList.add('opacity-0'), 2000)

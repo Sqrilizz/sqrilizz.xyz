@@ -33,7 +33,7 @@ export default function HomePage() {
   // Загружаем музыку при первом запуске
   useEffect(() => {
     const playlist = [
-      { title: 'KSB - Ruinery', src: '/music/KSB_muzic_Ruinery.mp3', cover: '/music/covers/ksb.banner.png' },
+      { title: 'XANAKIN SKYWOK - LOVESHOTS', src: '/music/piska.mp4', type: 'video', cover: '/music/covers/static.png' },
       // Добавьте больше треков здесь:
       // { title: 'Track 2', src: '/music/track2.mp3', cover: '/music/covers/track2.jpg' },
     ]
@@ -46,7 +46,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0b0b15] to-[#01010e] text-gray-100 p-6 relative">
       <StarField />
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-        <div className="md:col-span-1 flex flex-col gap-6">
+        <div className="md:col-span-1 flex flex-col gap-4">
           <ProfileCard user={USER} />
           <MusicPlayer />
           <DiscordRPC />
@@ -70,7 +70,8 @@ export default function HomePage() {
               </pre>
 
               <div className="mt-4 flex gap-3 flex-wrap">
-                <a className="inline-block px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-violet-500 text-white" href={USER.modrinth} target="_blank" rel="noreferrer">Modrinth</a>
+                <a className="inline-block px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-violet-500 text-white" href="/projects">💼 Projects</a>
+                <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href={USER.modrinth} target="_blank" rel="noreferrer">Modrinth</a>
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href={USER.socials.github} target="_blank" rel="noreferrer">GitHub</a>
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href="/contact">Contact</a>
                 <a className="inline-block px-4 py-2 rounded border border-[rgba(124,58,237,0.15)] text-gray-200" href="/wishlist">🎯 Wishlist</a>
