@@ -38,7 +38,19 @@ export default function MusicPlayer() {
         videoRef.current.src = src
         videoRef.current.volume = volume
         videoRef.current.load() // Принудительная загрузка
-        videoRef.current.onloadedmetadata = () => {
+        
+        const updateDuration = () => {
+          if (videoRef.current && videoRef.current.duration) {
+            setDuration(videoRef.current.duration)
+          }
+        }
+        
+        videoRef.current.onloadedmetadata = updateDuration
+        videoRef.current.ondurationchange = updateDuration
+        videoRef.current.oncanplay = updateDuration
+        
+        // Если duration уже доступна
+        if (videoRef.current.duration) {
           setDuration(videoRef.current.duration)
         }
       }
