@@ -172,14 +172,12 @@ export default function MusicPlayer() {
             onLoadedMetadata={(e) => {
               const dur = e.target.duration
               if (dur && isFinite(dur)) {
-                console.log('Duration set:', dur)
                 setDuration(dur)
               }
             }}
             onDurationChange={(e) => {
               const dur = e.target.duration
               if (dur && isFinite(dur)) {
-                console.log('Duration changed:', dur)
                 setDuration(dur)
               }
             }}
