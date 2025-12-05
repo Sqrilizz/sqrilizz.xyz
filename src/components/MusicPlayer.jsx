@@ -79,16 +79,16 @@ export default function MusicPlayer() {
   }, [volume, isVideo])
 
   const tick = () => {
-    if (isVideo && videoRef.current) {
+    if (isVideo && videoRef.current && !videoRef.current.paused) {
       setPos(videoRef.current.currentTime || 0)
-    } else if (soundRef.current) {
+      rafRef.current = requestAnimationFrame(tick)
+    } else if (soundRef.current && !soundRef.current.paused) {
       setPos(soundRef.current.seek() || 0)
+      rafRef.current = requestAnimationFrame(tick)
     }
-    rafRef.current = requestAnimationFrame(tick)
   }
 
   const toggle = async () => {
-    console.log('Toggle clicked, isVideo:', isVideo, 'playing:', playing)
     if (isVideo && videoRef.current) {
       if (playing) {
         videoRef.current.pause()
@@ -96,11 +96,9 @@ export default function MusicPlayer() {
         cancelAnimationFrame(rafRef.current)
       } else {
         try {
-          console.log('Attempting to play video...')
           await videoRef.current.play()
-          console.log('Video playing successfully')
           setPlaying(true)
-          rafRef.current = requestAnimationFrame(tick)
+          tick() // Запускаем tick сразу
         } catch (error) {
           console.error('Video play failed:', error)
         }
@@ -113,7 +111,7 @@ export default function MusicPlayer() {
       } else {
         soundRef.current.play()
         setPlaying(true)
-        rafRef.current = requestAnimationFrame(tick)
+        tick() // Запускаем tick сразу
       }
     }
   }
