@@ -180,10 +180,8 @@ export default function MusicPlayer() {
             loop
             playsInline
             crossOrigin="anonymous"
-            preload="auto"
-          >
-            <source src={currentTrack.src} type="video/mp4" />
-          </video>
+            preload="metadata"
+          />
           {/* Легкий градиент для читаемости текста */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
         </>
