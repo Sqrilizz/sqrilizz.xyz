@@ -1,172 +1,102 @@
-# 🚀 Sqrilizz Portfolio
+# Portfolio Website
 
-<div align="center">
-  <h3>Modern Interactive Developer Portfolio</h3>
-  <p><strong>React + Vite + Tailwind CSS + Framer Motion</strong></p>
+Modern portfolio website built with React, Vite, and Tailwind CSS featuring a Bento Grid layout.
 
-  ![Portfolio Preview](https://img.shields.io/badge/Status-Active-brightgreen)
-  ![React](https://img.shields.io/badge/React-18.2.0-blue)
-  ![Vite](https://img.shields.io/badge/Vite-4.4.5-646CFF)
-  ![Tailwind](https://img.shields.io/badge/Tailwind-3.3.0-38B2AC)
+## Features
 
-  **🌐 [View Demo](https://sqrilizz.xyz)** |
-  **📧 [Contact Me](mailto:contact@sqrlizz.xyz)**
-
-</div>
-
----
-
-## ✨ Features
-
-### 🎨 **Modern Design**
-- Dark theme with purple gradients
-- Animated starfield background
-- Glass-morphism card effects with blur
-
-### 🎵 **Interactive Music Player**
-- MP3 playback with album covers
-- Animated equalizer visualization
-- Volume and progress controls
-
-### 💬 **Terminal Interface**
-- VS Code style with animated cursor
-- Typing effect for text
-- Multi-language support (Russian/English)
-
-### 🎮 **Discord Rich Presence**
-- Real-time Discord activity display
-- Shows what you're playing, coding, or listening to
-- Spotify integration with live track info
-- WebSocket for instant updates
-
-### 🌍 **Responsive**
+- Dark minimalist design with Bento Grid layout
+- Real music player with Howler.js
+- Real-time Discord status via Lanyard API
+- Live weather widget with AccuWeather API
+- Automatic project fetching from GitHub and Modrinth
+- Favorites page with games, books, movies, and anime
+- Smooth animations with Framer Motion
 - Fully responsive design
-- Mobile device support
-- Modern web standards
 
-## 🚀 Quick Start
+## Tech Stack
 
-### Prerequisites
-- Node.js 16+
-- npm or yarn
+- **Framework:** React 18
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **Animations:** Framer Motion
+- **Audio:** Howler.js
+- **Routing:** React Router
+- **Deployment:** Vercel
 
-### Installation
+## Setup
 
+1. Clone the repository:
 ```bash
-# Clone the repository
-git clone https://github.com/Sqrilizz/ZovNew.git
-cd ZovNew
+git clone https://github.com/Sqrilizz/portfolio.git
+cd portfolio
+```
 
-# Install dependencies
+2. Install dependencies:
+```bash
 npm install
+```
 
-# Run in development mode
+3. Create `.env.local` file:
+```bash
+cp .env.example .env.local
+```
+
+4. Add your API keys to `.env.local`:
+```env
+ACCUWEATHER_API_KEY=your_accuweather_api_key
+VITE_MODRINTH_TOKEN=your_modrinth_token
+```
+
+5. Run development server:
+```bash
 npm run dev
+```
 
-# Build for production
+6. Build for production:
+```bash
 npm run build
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser!
+## Configuration
 
-## 🛠 Customization
+### Discord Integration
+Edit `src/config/discord.js` to change:
+- Discord User ID
+- Custom banner URL
 
-### 1. **Personal Information**
-Edit `src/components/HomePage.jsx`:
-```javascript
-const USER = {
-  nick: 'Sqrilizz',
-  role: 'Developer, Minecraft Modder, Web Designer & AI Engineer',
-  location: { country: 'Estonia', city: 'Tallinn' },
-  // ... your social links
-}
-```
+### Projects
+Edit `src/config/projects.js` to change:
+- GitHub username
+- Modrinth username
+- Excluded repositories
+- Custom project logos
 
-### 2. **Music Playlist**
-Add MP3 files to `public/music/` and configure in `src/components/HomePage.jsx`:
-```javascript
-const playlist = [
-  {
-    title: 'Track Name',
-    src: '/music/track.mp3',
-    cover: '/music/covers/cover.jpg'
-  }
-]
-```
+### Favorites
+Edit `src/config/favorites.js` to add/remove:
+- Games
+- Books
+- Movies
+- Anime
 
-### 3. **Discord Activity**
-See [DISCORD_SETUP.md](DISCORD_SETUP.md) for detailed instructions on setting up Discord Rich Presence integration.
+### Music
+Edit `src/components/bento/MusicCard.jsx` to change:
+- Music tracks
+- Cover images
 
-### 4. **Video Pages**
-Configure secret videos in `src/config/videos.js`:
-```javascript
-export const VIDEO_CONFIG = {
-  'Important': 'https://youtube.com/embed/...',
-  'Secret': '/videos/secret.mp4'
-}
-```
-Access: `yoursite.com/Important`, `yoursite.com/Secret`
+## Deployment
 
-### 5. **Images**
-- `public/avatar.png` - your avatar (square)
-- `public/favicon.ico` - site icon
-- `public/banner.jpg` - background banner
+The site is configured for deployment on Vercel. Simply connect your GitHub repository to Vercel and add the environment variables.
 
-## 📁 Project Structure
+### Environment Variables on Vercel
+- `ACCUWEATHER_API_KEY` - AccuWeather API key
+- `VITE_MODRINTH_TOKEN` - Modrinth API token
 
-```
-src/
-├── components/          # React components
-│   ├── HomePage.jsx    # Main page
-│   ├── ProfileCard.jsx # Profile card
-│   ├── MusicPlayer.jsx # Music player
-│   ├── TerminalCard.jsx# Terminal interface
-│   └── MottoCard.jsx   # Discord RPC card
-├── context/            # React contexts
-├── hooks/              # Custom hooks
-├── locales/            # Translations (RU/EN)
-├── utils/              # Utilities
-└── config/             # Configurations
-    └── discord.js      # Discord API config
+## License
 
-public/
-├── music/              # MP3 files and covers
-├── videos/             # Local videos
-└── images/             # Additional images
-```
+MIT License - feel free to use this project for your own portfolio!
 
-## 🛠 Technologies
+## Credits
 
-- **React 18** - modern framework
-- **Vite** - fast bundler and dev server
-- **Tailwind CSS** - utility-first CSS framework
-- **Framer Motion** - animations and transitions
-- **Howler.js** - audio handling
-- **React i18next** - internationalization
-- **React Icons** - beautiful icons
-- **Lanyard API** - Discord Rich Presence integration
-
-## 📊 Stats
-
-[![GitHub issues](https://img.shields.io/github/issues/Sqrilizz/ZovNew)](https://github.com/Sqrilizz/ZovNew/issues)
-[![GitHub stars](https://img.shields.io/github/stars/Sqrilizz/ZovNew)](https://github.com/Sqrilizz/ZovNew/stargazers)
-[![GitHub license](https://img.shields.io/github/license/Sqrilizz/ZovNew)](https://github.com/Sqrilizz/ZovNew/blob/master/LICENSE)
-
-## 📝 License
-
-This project is licensed under the [MIT License](LICENSE) - feel free to use it for your own portfolio!
-
-## 🤝 Contact
-
-**Sqrilizz** - Developer & Creator
-
-- 🌐 **Website:** [sqrilizz.fun | Bio](https://sqrilizz.fun)
-- 💬 **Telegram:** [@sqrilizz](https://t.me/sqrilizz)
-- 📧 **Email:** contact@sqrlizz.xyz
-- 🎮 **Modrinth:** [modrinth.com/user/Sqrilizz](https://modrinth.com/user/Sqrilizz)
-
----
-
-<div align="center">
-  <strong>⭐ Don't forget to star the repo if you like it!</strong>
-</div>
+- Design inspiration: Modern Bento Grid layouts
+- Icons: React Icons
+- Fonts: System fonts

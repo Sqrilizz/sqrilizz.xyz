@@ -20,9 +20,9 @@ export default function MusicPlayer() {
     
     const currentTrack = playlist[currentIndex]
     const src = currentTrack.src
-    const isVideoFile = src.endsWith('.mp4') || src.endsWith('.webm') || currentTrack.type === 'video'
     
-    setIsVideo(isVideoFile)
+    // Всегда используем только аудио режим (извлекаем аудио из видео или играем аудио файл)
+    setIsVideo(false) // Всегда false, так как мы играем только аудио
     setPlaying(false)
     setPos(0)
     
@@ -32,26 +32,21 @@ export default function MusicPlayer() {
       soundRef.current = null
     }
     
-    if (isVideoFile) {
-      // Используем HTML5 video для видео
-      if (videoRef.current) {
-        videoRef.current.volume = volume
-      }
-    } else {
-      // Используем Howler для аудио
-      soundRef.current = new Howl({ 
-        src: [src], 
-        html5: true, 
-        volume: volume,
-        onload: () => setDuration(soundRef.current.duration()) 
-      })
-    }
+    // Всегда используем Howler для аудио (извлекает аудио из видео автоматически)
+    soundRef.current = new Howl({ 
+      src: [src], 
+      html5: true, 
+      volume: volume,
+      onload: () => setDuration(soundRef.current.duration()) 
+    })
     
     return () => { 
       if (soundRef.current) soundRef.current.unload()
-      if (videoRef.current) videoRef.current.pause()
+      if (videoRef.current && typeof videoRef.current.pause === 'function') {
+        videoRef.current.pause()
+      }
     }
-  }, [currentIndex, playlist]) // Убрали volume из зависимостей!
+  }, [currentIndex, playlist])
 
   useEffect(() => {
     return () => cancelAnimationFrame(rafRef.current)
@@ -67,13 +62,21 @@ export default function MusicPlayer() {
   }, [volume, isVideo])
 
   const tick = () => {
-    if (isVideo && videoRef.current) {
-      setPos(videoRef.current.currentTime || 0)
-      if (!videoRef.current.paused && !videoRef.current.ended) {
-        rafRef.current = requestAnimationFrame(tick)
+    // Всегда используем только soundRef для отслеживания прогресса
+    if (soundRef.current) {
+      const currentTime = soundRef.current.seek() || 0
+      setPos(currentTime)
+      
+      // Синхронизируем визуальное видео с аудио (только для видео, не для GIF)
+      const currentTrack = playlist[currentIndex]
+      if (videoRef.current && currentTrack?.videoUrl && !currentTrack.videoUrl.endsWith('.gif') && playing) {
+        const videoDiff = Math.abs(videoRef.current.currentTime - currentTime)
+        // Если разница больше 0.5 секунды, синхронизируем
+        if (videoDiff > 0.5) {
+          videoRef.current.currentTime = currentTime
+        }
       }
-    } else if (soundRef.current) {
-      setPos(soundRef.current.seek() || 0)
+      
       if (!soundRef.current.paused) {
         rafRef.current = requestAnimationFrame(tick)
       }
@@ -81,45 +84,52 @@ export default function MusicPlayer() {
   }
 
   const toggle = async () => {
-    if (isVideo && videoRef.current) {
-      if (playing) {
-        videoRef.current.pause()
-        setPlaying(false)
-        cancelAnimationFrame(rafRef.current)
-      } else {
-        try {
-          await videoRef.current.play()
-          setPlaying(true)
-          tick() // Запускаем tick сразу
-        } catch (error) {
-          console.error('Video play failed:', error)
-        }
-      }
-    } else if (soundRef.current) {
+    const currentTrack = playlist[currentIndex]
+    
+    // Всегда используем только аудио
+    if (soundRef.current) {
       if (playing) {
         soundRef.current.pause()
         setPlaying(false)
         cancelAnimationFrame(rafRef.current)
+        // Останавливаем визуальное видео (только если это не GIF)
+        if (videoRef.current && currentTrack?.videoUrl && !currentTrack.videoUrl.endsWith('.gif')) {
+          videoRef.current.pause()
+        }
       } else {
         soundRef.current.play()
         setPlaying(true)
         tick() // Запускаем tick сразу
+        // Запускаем визуальное видео синхронно (только если это не GIF)
+        if (videoRef.current && currentTrack?.videoUrl && !currentTrack.videoUrl.endsWith('.gif')) {
+          try {
+            // Синхронизируем время перед воспроизведением
+            videoRef.current.currentTime = soundRef.current.seek() || 0
+            await videoRef.current.play()
+          } catch (error) {
+            console.error('Visual video play failed:', error)
+          }
+        }
       }
     }
   }
 
   const seek = (e) => {
+    const currentTrack = playlist[currentIndex]
     const rect = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - rect.left
     const pct = Math.max(0, Math.min(1, x / rect.width))
     const newTime = pct * duration
     
-    if (isVideo && videoRef.current) {
-      videoRef.current.currentTime = newTime
-      setPos(newTime)
-    } else if (soundRef.current) {
+    // Всегда используем только soundRef для перемотки
+    if (soundRef.current) {
       soundRef.current.seek(newTime)
       setPos(newTime)
+      
+      // Синхронизируем визуальное видео если оно есть (только для видео, не для GIF)
+      if (videoRef.current && currentTrack?.videoUrl && !currentTrack.videoUrl.endsWith('.gif')) {
+        videoRef.current.currentTime = newTime
+      }
     }
   }
 
@@ -150,38 +160,36 @@ export default function MusicPlayer() {
 
   return (
     <div className="card relative overflow-hidden">
-      {/* Видео или фоновое изображение */}
-      {isVideo ? (
+      {/* Визуальное видео или обложка */}
+      {currentTrack?.videoUrl ? (
         <>
-          {/* Статичный баннер когда видео не играет */}
+          {/* Статичная обложка когда не играет */}
           {!playing && currentTrack?.cover && (
             <div
               className="absolute inset-0 bg-cover bg-center pointer-events-none"
               style={{ backgroundImage: `url(${currentTrack.cover})` }}
             />
           )}
-          {/* Видео */}
-          <video
-            ref={videoRef}
-            src={currentTrack.src}
-            className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
-            loop
-            playsInline
-            crossOrigin="anonymous"
-            preload="metadata"
-            onLoadedMetadata={(e) => {
-              const dur = e.target.duration
-              if (dur && isFinite(dur)) {
-                setDuration(dur)
-              }
-            }}
-            onDurationChange={(e) => {
-              const dur = e.target.duration
-              if (dur && isFinite(dur)) {
-                setDuration(dur)
-              }
-            }}
-          />
+          {/* Визуальное видео/GIF */}
+          {currentTrack.videoUrl.endsWith('.gif') ? (
+            <img
+              ref={videoRef}
+              src={currentTrack.videoUrl}
+              className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
+              alt="Visual"
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              src={currentTrack.videoUrl}
+              className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${playing ? 'opacity-100' : 'opacity-0'}`}
+              loop
+              muted // Без звука, так как звук идет из Howler
+              playsInline
+              crossOrigin="anonymous"
+              preload="metadata"
+            />
+          )}
           {/* Легкий градиент для читаемости текста */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
         </>
@@ -198,27 +206,31 @@ export default function MusicPlayer() {
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/60 to-violet-950/60 pointer-events-none" />
       )}
       
-      {/* Информация о треке с кнопкой play */}
+      {/* Информация о треке с кнопками */}
       <div className="flex items-center gap-4 mb-4">
         <div className="flex-1">
           <h3 className="text-white font-medium text-sm drop-shadow-2xl">{currentTrack?.title || 'No track selected'}</h3>
           <p className="text-gray-200 text-xs drop-shadow-lg">Now Playing</p>
         </div>
-        {/* Кнопка play/pause */}
-        <button
-          onClick={toggle}
-          className="w-12 h-12 bg-gradient-to-r from-purple-600 to-violet-500 rounded-full flex items-center justify-center hover:from-purple-700 hover:to-violet-600 transition-all duration-300 hover:scale-105 shadow-lg"
-        >
-          {playing ? (
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-            </svg>
-          ) : (
-            <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          )}
-        </button>
+        
+        {/* Кнопки управления */}
+        <div className="flex items-center gap-2">
+          {/* Кнопка play/pause */}
+          <button
+            onClick={toggle}
+            className="w-12 h-12 bg-gradient-to-r from-purple-600 to-violet-500 rounded-full flex items-center justify-center hover:from-purple-700 hover:to-violet-600 transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            {playing ? (
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Прогресс бар */}

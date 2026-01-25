@@ -1,28 +1,23 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { MusicProvider } from './context/MusicContext'
-import HomePage from './components/HomePage'
-import ProjectsPage from './components/ProjectsPage'
-import VideoPage from './components/VideoPage'
-import ContactPage from './components/ContactPage'
-import WishlistPage from './components/WishlistPage'
-import WishlistAdmin from './components/WishlistAdmin'
+import { SettingsProvider } from './context/SettingsContext'
+import BentoLayout from './components/bento/BentoLayout'
+import FavoritesPage from './pages/FavoritesPage'
+import './i18n'
 
 export default function App() {
   return (
-    <MusicProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
-          <Route path="/admin/wishlist" element={<WishlistAdmin />} />
-          <Route path="/:videoId" element={<VideoPage />} />
-        </Routes>
-      </Router>
-      <Analytics />
-    </MusicProvider>
+    <SettingsProvider>
+      <MusicProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<BentoLayout />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+          </Routes>
+        </Router>
+        <Analytics />
+      </MusicProvider>
+    </SettingsProvider>
   )
 }

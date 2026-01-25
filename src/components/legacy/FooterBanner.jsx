@@ -10,7 +10,7 @@ export default function FooterBanner() {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 2, duration: 1 }}
-      className="relative mt-12 h-64 rounded-2xl overflow-hidden"
+      className="relative mt-7 h-64 rounded-2xl overflow-hidden"
     >
       {/* Фоновое изображение */}
       <div 

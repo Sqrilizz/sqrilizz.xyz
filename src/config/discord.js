@@ -9,6 +9,9 @@ export const DISCORD_CONFIG = {
   // WebSocket для real-time обновлений (опционально)
   LANYARD_WS: 'wss://api.lanyard.rest/socket',
   
+  // Кастомный баннер для Discord RPC карточки (GIF/PNG/JPG)
+  CUSTOM_BANNER: 'https://i.pinimg.com/originals/31/e1/03/31e1037b1b30c313806263929812df66.gif', // Замени на свою ссылку
+  
   // Альтернативный способ - ваш собственный Discord Bot
   // BOT_TOKEN: 'your_bot_token_here', // НЕ ИСПОЛЬЗУЙТЕ В ПРОДАКШЕНЕ!
   // DISCORD_API: 'https://discord.com/api/v10'
@@ -267,4 +270,67 @@ export const getClanTag = (user) => {
   }
   
   return null
+}
+
+// Утилита для получения декорации аватара
+export const getAvatarDecorationUrl = (user, size = 64) => {
+  if (!user?.avatar_decoration_data?.asset) return null
+  
+  return `https://cdn.discordapp.com/avatar-decoration-presets/${user.avatar_decoration_data.asset}.png?size=${size}`
+}
+
+// Утилита для получения баннера пользователя
+export const getUserBannerUrl = (user, size = 512) => {
+  if (!user?.banner) return null
+  
+  const extension = user.banner.startsWith('a_') ? 'gif' : 'png'
+  return `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${extension}?size=${size}`
+}
+
+// Утилита для получения цвета баннера (если нет изображения)
+export const getUserBannerColor = (user) => {
+  return user?.banner_color || null
+}
+
+// Утилита для получения значков пользователя (badges)
+export const getUserBadges = (user) => {
+  if (!user?.public_flags) return []
+  
+  const badges = []
+  const flags = user.public_flags
+  
+  // Discord Staff
+  if (flags & (1 << 0)) badges.push({ name: 'Discord Staff', emoji: '👨‍💼' })
+  
+  // Discord Partner
+  if (flags & (1 << 1)) badges.push({ name: 'Discord Partner', emoji: '🤝' })
+  
+  // HypeSquad Events
+  if (flags & (1 << 2)) badges.push({ name: 'HypeSquad Events', emoji: '🎉' })
+  
+  // Bug Hunter Level 1
+  if (flags & (1 << 3)) badges.push({ name: 'Bug Hunter', emoji: '🐛' })
+  
+  // HypeSquad Bravery
+  if (flags & (1 << 6)) badges.push({ name: 'HypeSquad Bravery', emoji: '💜' })
+  
+  // HypeSquad Brilliance
+  if (flags & (1 << 7)) badges.push({ name: 'HypeSquad Brilliance', emoji: '💖' })
+  
+  // HypeSquad Balance
+  if (flags & (1 << 8)) badges.push({ name: 'HypeSquad Balance', emoji: '💚' })
+  
+  // Early Supporter
+  if (flags & (1 << 9)) badges.push({ name: 'Early Supporter', emoji: '⭐' })
+  
+  // Bug Hunter Level 2
+  if (flags & (1 << 14)) badges.push({ name: 'Bug Hunter Gold', emoji: '🏆' })
+  
+  // Verified Bot Developer
+  if (flags & (1 << 17)) badges.push({ name: 'Verified Bot Developer', emoji: '🔧' })
+  
+  // Active Developer
+  if (flags & (1 << 22)) badges.push({ name: 'Active Developer', emoji: '⚡' })
+  
+  return badges
 }

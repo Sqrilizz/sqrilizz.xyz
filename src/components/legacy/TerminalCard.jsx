@@ -1,16 +1,26 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
 export default function TerminalCard({ user, children }) {
   const { t } = useTranslation()
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="bg-[#060611] p-6 rounded-2xl border border-[rgba(90,89,185,0.12)]">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-3 h-3 rounded-full bg-red-400" />
         <div className="w-3 h-3 rounded-full bg-yellow-400" />
         <div className="w-3 h-3 rounded-full bg-green-400" />
-        <div className="ml-auto text-xs text-gray-400">~/about-me</div>
+        <div className="ml-auto flex items-center gap-3 text-xs text-gray-400">
+          <span className="font-mono">{currentTime.toLocaleTimeString()}</span>
+          <span>~/about-me</span>
+        </div>
       </div>
       <div className="font-mono text-sm text-gray-200 relative">
         {children}

@@ -4,18 +4,6 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/contact",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/wishlist",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin/wishlist",
-      "destination": "/index.html"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

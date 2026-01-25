@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fetchDiscordActivity, getMainActivity, formatActivityTime, LanyardWebSocket, DISCORD_CONFIG, getDiscordAvatarUrl, getDefaultDiscordAvatarUrl, getActivityImageUrl, getActivityImageText, formatDiscordUsername, getUserTag, getClanBadgeUrl, getClanTag } from '../config/discord'
+import { fetchDiscordActivity, getMainActivity, formatActivityTime, LanyardWebSocket, DISCORD_CONFIG, getDiscordAvatarUrl, getDefaultDiscordAvatarUrl, getActivityImageUrl, getActivityImageText, formatDiscordUsername, getUserTag, getClanBadgeUrl, getClanTag, getAvatarDecorationUrl, getUserBadges } from '../config/discord'
 
 export default function DiscordRPC() {
   const [discordData, setDiscordData] = useState(null)
@@ -72,10 +72,10 @@ export default function DiscordRPC() {
         initial={{ opacity: 0, y: 8 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="card hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 h-[124px] flex items-center justify-center"
+        className="card hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 h-[160px] flex items-center justify-center"
       >
         <div className="flex items-center gap-3">
-          <div className="w-4 h-4 bg-purple-500 rounded-full animate-pulse"></div>
+          <div className="w-5 h-5 bg-purple-500 rounded-full animate-pulse"></div>
           <span className="text-gray-400 text-sm">Loading Discord activity...</span>
         </div>
       </motion.div>
@@ -88,7 +88,7 @@ export default function DiscordRPC() {
         initial={{ opacity: 0, y: 8 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="card hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 h-[124px] flex items-center justify-center"
+        className="card hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 h-[160px] flex items-center justify-center"
       >
         <div className="text-center">
           <div className="w-3 h-3 bg-red-500 rounded-full mx-auto mb-2"></div>
@@ -105,7 +105,7 @@ export default function DiscordRPC() {
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 0.4, duration: 0.5 }}
         whileHover={{ scale: 1.02, y: -2 }}
-        className="card hover:shadow-xl hover:shadow-[#5865F2]/20 transition-all duration-300 h-[108px] relative overflow-hidden border border-[#5865F2]/10 hover:border-[#5865F2]/30"
+        className="card hover:shadow-xl hover:shadow-[#5865F2]/20 transition-all duration-300 h-[160px] relative overflow-hidden border border-[#5865F2]/10 hover:border-[#5865F2]/30 flex items-center justify-center"
       >
         {/* Градиентный фон */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#5865F2]/5 via-transparent to-purple-600/5 pointer-events-none" />
@@ -123,27 +123,17 @@ export default function DiscordRPC() {
           </div>
         </motion.div>
 
-        <div className="flex items-center gap-3 h-full">
-          {/* Аватар пользователя оффлайн */}
-          <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center shadow-lg">
-              <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-              </svg>
-            </div>
-            {/* Статус индикатор оффлайн */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gray-500 rounded-full border-2 border-[rgba(14,16,29,0.95)] shadow-lg" />
-          </div>
+        <div className="flex items-center justify-center gap-2 h-full w-full px-4">
+          {/* Статус индикатор оффлайн */}
+          <motion.div 
+            className="w-3 h-3 bg-gray-500 rounded-full"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
 
           {/* Информация об оффлайн статусе */}
-          <div className="flex-1 min-w-0">
-            <div className="text-white text-sm font-medium flex items-center gap-1.5">
-              <span className="text-gray-500">💤</span>
-              <span className="truncate">Sqrilizz</span>
-            </div>
-            <div className="text-gray-400 text-xs">
-              <span>Currently offline</span>
-            </div>
+          <div className="text-gray-400 text-sm">
+            Currently offline
           </div>
         </div>
 
@@ -163,7 +153,7 @@ export default function DiscordRPC() {
       animate={{ opacity: 1, y: 0 }} 
       transition={{ delay: 0.4, duration: 0.5 }}
       whileHover={{ scale: 1.02, y: -2 }}
-      className="card hover:shadow-xl hover:shadow-[#5865F2]/20 transition-all duration-300 h-[105px] relative overflow-hidden border border-[#5865F2]/10 hover:border-[#5865F2]/30"
+      className="card hover:shadow-xl hover:shadow-[#5865F2]/20 transition-all duration-300 h-[160px] relative overflow-hidden border border-[#5865F2]/10 hover:border-[#5865F2]/30 flex items-center justify-center"
     >
       {/* Градиентный фон */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#5865F2]/5 via-transparent to-purple-600/5 pointer-events-none" />
@@ -181,41 +171,10 @@ export default function DiscordRPC() {
         </div>
       </motion.div>
 
-      <div className="flex items-center gap-3 h-full">
-        {/* Аватар пользователя */}
-        <motion.div 
-          className="relative flex-shrink-0"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        >
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#5865F2] to-purple-600 flex items-center justify-center shadow-lg">
-            <img 
-              src={getDiscordAvatarUrl(discordData.user) || getDefaultDiscordAvatarUrl(discordData.user)}
-              alt={discordData.user?.display_name || discordData.user?.username || 'Discord User'}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.style.display = 'none'
-                e.target.nextSibling.style.display = 'flex'
-              }}
-            />
-            <div className="w-full h-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center" style={{display: 'none'}}>
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-              </svg>
-            </div>
-          </div>
-          
-          {/* Статус индикатор */}
-          <motion.div 
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${getStatusColor(discordData.status)} rounded-full border-2 border-[rgba(14,16,29,0.95)] shadow-lg`}
-            animate={discordData.status === 'online' ? { scale: [1, 1.1, 1] } : {}}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </motion.div>
-
+      <div className="flex items-center gap-3 h-full w-full">
         {/* Активность с анимацией */}
         <motion.div 
-          className="flex-1 min-w-0"
+          className="flex-1 min-w-0 w-full"
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.6, duration: 0.4 }}
@@ -287,42 +246,16 @@ export default function DiscordRPC() {
               </div>
             </div>
           ) : (
-            <>
-              <div className="flex items-center justify-between w-full">
-                <div className="text-white text-sm font-medium flex items-center gap-1.5">
-                  <span className="text-green-400">✨</span>
-                  <span className="truncate">{formatDiscordUsername(discordData.user)}</span>
-                </div>
-                {/* TL Badge - справа */}
-                {getClanTag(discordData.user) && (
-                  <div className="flex items-center gap-1 bg-[#5865F2]/20 border border-[#5865F2]/30 px-1.5 py-0.5 rounded text-xs flex-shrink-0">
-                    {getClanBadgeUrl(discordData.user) ? (
-                      <>
-                        <img 
-                          src={getClanBadgeUrl(discordData.user)}
-                          alt={getClanTag(discordData.user)}
-                          className="w-2.5 h-2.5 object-contain"
-                          title={`Clan: ${getClanTag(discordData.user)}`}
-                        />
-                        <span className="text-[#5865F2] font-bold text-xs">
-                          {getClanTag(discordData.user)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-[#5865F2] font-bold text-xs">
-                        {getClanTag(discordData.user)}
-                      </span>
-                    )}
-                  </div>
-                )}
+            <div className="flex items-center gap-2">
+              <motion.div 
+                className={`w-3 h-3 ${getStatusColor(discordData.status)} rounded-full`}
+                animate={discordData.status === 'online' ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <div className="text-gray-400 text-sm">
+                No activity detected
               </div>
-              <div className="text-gray-400 text-xs">
-                <div>No activity detected</div>
-                <div className="text-xs text-gray-500 mt-0.5">
-                  Status: {discordData.status} • Desktop: {discordData.active_on_discord_desktop ? 'Yes' : 'No'}
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </motion.div>
       </div>
