@@ -4,10 +4,10 @@ export const MusicContext = createContext(null)
 
 const defaultPlaylist = [
   {
-    title: 'Ruinery',
-    artist: 'KSB Music',
-    src: '/music/KSB_muzic_Ruinery.mp3',
-    cover: '/music/covers/ksb.banner.png'
+    title: 'You',
+    artist: 'Unknown Artist',
+    src: '/music/you.mp3',
+    cover: '/music/covers/static.png'
   }
 ]
 

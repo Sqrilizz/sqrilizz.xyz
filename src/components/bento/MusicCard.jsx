@@ -5,10 +5,10 @@ import { Howl } from 'howler'
 
 const playlist = [
   { 
-    title: 'Ruinery', 
-    artist: 'KSB', 
+    title: 'Ты (you)', 
+    artist: 'Ksb Muzik', 
     cover: '/music/covers/ksb.banner.png', 
-    src: '/music/KSB_muzic_Ruinery.mp3' 
+    src: '/music/you.mp3' 
   }
 ]
 

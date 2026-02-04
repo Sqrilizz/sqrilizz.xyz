@@ -9,12 +9,80 @@ export default function WeatherCard() {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = await fetch('/api/weather')
+        // Call Open-Meteo API directly (no backend needed)
+        const TALLINN_LAT = '59.437'
+        const TALLINN_LON = '24.7536'
+        
+        const response = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${TALLINN_LAT}&longitude=${TALLINN_LON}&current=temperature_2m,weather_code&timezone=auto`
+        )
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+        
         const data = await response.json()
         
-        if (data && data[0]) {
-          setWeather(data[0])
+        // Weather code mapping (WMO Weather interpretation codes)
+        const getWeatherDescription = (code) => {
+          const weatherCodes = {
+            0: 'Clear sky',
+            1: 'Mainly clear',
+            2: 'Partly cloudy',
+            3: 'Overcast',
+            45: 'Foggy',
+            48: 'Depositing rime fog',
+            51: 'Light drizzle',
+            53: 'Moderate drizzle',
+            55: 'Dense drizzle',
+            61: 'Slight rain',
+            63: 'Moderate rain',
+            65: 'Heavy rain',
+            71: 'Slight snow',
+            73: 'Moderate snow',
+            75: 'Heavy snow',
+            77: 'Snow grains',
+            80: 'Slight rain showers',
+            81: 'Moderate rain showers',
+            82: 'Violent rain showers',
+            85: 'Slight snow showers',
+            86: 'Heavy snow showers',
+            95: 'Thunderstorm',
+            96: 'Thunderstorm with slight hail',
+            99: 'Thunderstorm with heavy hail'
+          }
+          return weatherCodes[code] || 'Unknown'
         }
+
+        // Convert weather code to icon number
+        const getWeatherIcon = (code) => {
+          if (code === 0 || code === 1) return 800 // Clear
+          if (code === 2 || code === 3) return 801 // Clouds
+          if (code === 45 || code === 48) return 741 // Fog
+          if (code >= 51 && code <= 55) return 300 // Drizzle
+          if (code >= 61 && code <= 65) return 500 // Rain
+          if (code >= 71 && code <= 77) return 600 // Snow
+          if (code >= 80 && code <= 82) return 521 // Rain showers
+          if (code >= 85 && code <= 86) return 621 // Snow showers
+          if (code >= 95 && code <= 99) return 200 // Thunderstorm
+          return 801
+        }
+
+        const weatherCode = data.current.weather_code
+        
+        // Format to match expected structure
+        const formatted = {
+          Temperature: {
+            Metric: {
+              Value: Math.round(data.current.temperature_2m),
+              Unit: 'C'
+            }
+          },
+          WeatherText: getWeatherDescription(weatherCode),
+          WeatherIcon: getWeatherIcon(weatherCode)
+        }
+        
+        setWeather(formatted)
         setLoading(false)
       } catch (error) {
         console.error('Error fetching weather:', error)
@@ -29,13 +97,13 @@ export default function WeatherCard() {
   }, [])
 
   const getWeatherIcon = (iconNumber) => {
-    // AccuWeather icon codes
-    if ([1, 2, 3, 4, 5].includes(iconNumber)) return <WiDaySunny size={32} />
-    if ([6, 7, 8].includes(iconNumber)) return <WiCloudy size={32} />
-    if ([11].includes(iconNumber)) return <WiFog size={32} />
-    if ([12, 13, 14, 18].includes(iconNumber)) return <WiRain size={32} />
-    if ([15, 16, 17].includes(iconNumber)) return <WiThunderstorm size={32} />
-    if ([19, 20, 21, 22, 23, 24, 25, 26].includes(iconNumber)) return <WiSnow size={32} />
+    // OpenWeatherMap icon codes (weather condition IDs)
+    if (iconNumber >= 200 && iconNumber < 300) return <WiThunderstorm size={32} /> // Thunderstorm
+    if (iconNumber >= 300 && iconNumber < 600) return <WiRain size={32} /> // Drizzle/Rain
+    if (iconNumber >= 600 && iconNumber < 700) return <WiSnow size={32} /> // Snow
+    if (iconNumber >= 700 && iconNumber < 800) return <WiFog size={32} /> // Atmosphere (fog, mist, etc)
+    if (iconNumber === 800) return <WiDaySunny size={32} /> // Clear
+    if (iconNumber > 800) return <WiCloudy size={32} /> // Clouds
     return <WiCloudy size={32} />
   }
 
