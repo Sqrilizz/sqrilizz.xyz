@@ -6,6 +6,7 @@ import ProjectsCard from './ProjectsCard'
 import TerminalCard from './TerminalCard'
 import ContactCard from './ContactCard'
 import WeatherCard from './WeatherCard'
+import VisitorCard from './VisitorCard'
 
 export default function BentoLayout() {
   return (
@@ -109,6 +110,16 @@ export default function BentoLayout() {
             transition={{ duration: 0.5, delay: 0.25 }}
           >
             <WeatherCard />
+          </motion.div>
+
+          {/* Visitor Counter */}
+          <motion.div 
+            className="row-span-1 md:col-span-1 lg:col-span-1 lg:row-span-1"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+          >
+            <VisitorCard />
           </motion.div>
 
           {/* Featured Projects */}

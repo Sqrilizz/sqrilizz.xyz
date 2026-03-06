@@ -5,6 +5,7 @@ const commands = [
   { cmd: 'whoami', output: 'Matthew, i am a developer from Estonia' },
   { cmd: 'cat about.txt', output: 'Full-stack developer passionate about creating amazing experiences' },
   { cmd: 'ls skills/', output: 'React  Python  Java  AI  WebDev  Minecraft' },
+  { cmd: 'neofetch --stdout', output: 'OS: Zorin OS 18\nCPU: Intel i5-11400H\nGPU: NVIDIA RTX 3050\nRAM: 16 GB' },
   { cmd: 'echo $STATUS', output: 'Available for freelance projects' }
 ]
 

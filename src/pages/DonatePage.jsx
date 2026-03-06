@@ -11,20 +11,21 @@ export default function DonatePage() {
       case 'paypal':
         return (
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-            <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H7.72a.483.483 0 01-.477-.558L7.418 21h1.518l.95-6.02h1.385c4.678 0 7.75-2.203 8.796-6.502z"/>
-            <path d="M2.379 0h9.28a3.7 3.7 0 013.556 2.516 4.6 4.6 0 01-.816 4.447c-1.11 1.328-2.94 2.037-5.294 2.037H7.734a.8.8 0 00-.794.68l-.867 5.498a.483.483 0 01-.477.402H2.852a.483.483 0 01-.477-.558L4.126.558A.483.483 0 014.603 0h-2.224z"/>
+            <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H7.72a.483.483 0 01-.477-.558l.265-1.687.63-3.994.04-.22a.805.805 0 01.794-.68h.5c3.238 0 5.774-1.314 6.514-5.12.256-1.313.192-2.447-.3-3.327a3.7 3.7 0 00-1.032-1.204c.836.622 1.416 1.506 1.632 2.593z"/>
+            <path d="M8.105 8.478c.256-1.313.192-2.447-.3-3.327A3.654 3.654 0 006.773 3.947a3.7 3.7 0 00-1.032-1.204C6.577 3.365 7.157 4.249 7.373 5.336c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H-4.28a.483.483 0 01-.477-.558l.265-1.687.63-3.994.04-.22a.805.805 0 01.794-.68h.5c3.238 0 5.774-1.314 6.514-5.12z"/>
           </svg>
         )
       case 'bank':
         return (
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-            <path d="M12 2L2 7v2h20V7l-10-5zM4 11v8h2v-8H4zm4 0v8h2v-8H8zm4 0v8h2v-8h-2zm4 0v8h2v-8h-2zm4 0v8h2v-8h-2zM2 21h20v2H2v-2z"/>
+            <path d="M11.5 1L0 6v2h23V6l-11.5-5zM2 10v9h2v-9H2zm4 0v9h2v-9H6zm4 0v9h2v-9h-2zm4 0v9h2v-9h-2zm4 0v9h2v-9h-2zm4 0v9h2v-9h-2zM0 20h23v2H0v-2z"/>
           </svg>
         )
       case 'trc20':
         return (
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"/>
+          <svg viewBox="0 0 2000 2000" fill="currentColor" className="w-5 h-5">
+            <path d="M1000 0c552.26 0 1000 447.74 1000 1000s-447.76 1000-1000 1000S0 1552.38 0 1000 447.68 0 1000 0z"/>
+            <path fill="#fff" d="M1123.42 866.76V718h340.18V491.34H537.28V718H877.5v148.64C601 879.34 393.1 934.1 393.1 999.7s208 120.36 484.4 133.14v476.5h246V1132.8c276.48-12.74 484.48-67.46 484.48-133.1s-208-120.36-484.48-133.1v-.04zm0 225.64v-.12c-6.94.44-42.6 2.58-122 2.58-63.48 0-108.14-1.8-123.88-2.62v.2C633.34 1081.66 451 1039.12 451 988.22S633.36 894.84 877.62 884v166.1c16 1.1 61.76 3.8 124.92 3.8 75.86 0 114-3.16 121-3.8V884c243.8 10.86 425.72 53.44 425.72 104.16s-182 93.32-425.72 104.18v.06z"/>
           </svg>
         )
       default:
@@ -185,32 +186,73 @@ export default function DonatePage() {
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2.5 bg-gradient-to-br ${method.color} rounded-xl`}>
-                          {getIcon(method.type)}
+                        <div className="w-10 h-10 flex items-center justify-center">
+                          {method.icon ? (
+                            <img src={method.icon} alt={method.name} className="w-8 h-8" />
+                          ) : (
+                            getIcon(method.type)
+                          )}
                         </div>
                         <h3 className="text-lg font-bold text-white">{method.name}</h3>
                       </div>
-                      <button
-                        onClick={() => copyToClipboard(method.address, method.name)}
-                        className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
-                          isCopied
-                            ? 'bg-green-500/20 border-green-500/50 text-green-400'
-                            : `bg-zinc-800/50 border-zinc-800 text-white hover:border-zinc-700 hover:bg-zinc-800/70`
-                        } border`}
-                      >
-                        {isCopied ? '✓ Copied' : 'Copy'}
-                      </button>
+                      {method.telegramLink ? (
+                        <a
+                          href={method.telegramLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 rounded-lg font-bold text-xs bg-blue-500/20 border-blue-500/50 text-blue-400 hover:bg-blue-500/30 transition-all border"
+                        >
+                          Contact
+                        </a>
+                      ) : method.paypalLink ? (
+                        <a
+                          href={method.paypalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 rounded-lg font-bold text-xs bg-blue-500/20 border-blue-500/50 text-blue-400 hover:bg-blue-500/30 transition-all border"
+                        >
+                          Donate
+                        </a>
+                      ) : method.buymeacoffeeLink ? (
+                        <a
+                          href={method.buymeacoffeeLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 rounded-lg font-bold text-xs bg-yellow-500/20 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/30 transition-all border"
+                        >
+                          Support
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => copyToClipboard(method.address, method.name)}
+                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                            isCopied
+                              ? 'bg-green-500/20 border-green-500/50 text-green-400'
+                              : `bg-zinc-800/50 border-zinc-800 text-white hover:border-zinc-700 hover:bg-zinc-800/70`
+                          } border`}
+                        >
+                          {isCopied ? '✓ Copied' : 'Copy'}
+                        </button>
+                      )}
                     </div>
                     
-                    <div className="bg-zinc-800/30 backdrop-blur-sm rounded-xl p-3 border border-zinc-800">
-                      {method.recipientName && (
-                        <div className="mb-2 pb-2 border-b border-zinc-700/50">
-                          <p className="text-zinc-500 text-xs mb-1">Recipient:</p>
-                          <p className="text-zinc-200 font-medium text-sm">{method.recipientName}</p>
-                        </div>
-                      )}
-                      <p className="text-zinc-300 font-mono text-xs break-all">{method.address}</p>
-                    </div>
+                    {!method.hideAddress && (
+                      <div className="bg-zinc-800/30 backdrop-blur-sm rounded-xl p-3 border border-zinc-800">
+                        {method.recipientName && (
+                          <div className="mb-2 pb-2 border-b border-zinc-700/50">
+                            <p className="text-zinc-500 text-xs mb-1">Recipient:</p>
+                            <p className="text-zinc-200 font-medium text-sm">{method.recipientName}</p>
+                          </div>
+                        )}
+                        <p className="text-zinc-300 font-mono text-xs break-all">{method.address}</p>
+                      </div>
+                    )}
+                    
+                    {method.hideAddress && (
+                      <div className="bg-zinc-800/30 backdrop-blur-sm rounded-xl p-3 border border-zinc-800">
+                        <p className="text-zinc-400 text-sm text-center">{method.address}</p>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )

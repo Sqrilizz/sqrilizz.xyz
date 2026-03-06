@@ -9,24 +9,24 @@
     
     <!-- Primary Meta Tags -->
     <title>Sqrilizz.xyz - Portfolio</title>
-    <meta name="description" content="Developer, Minecraft Modder & AI Engineer from Estonia" />
+    <meta name="description" content="Full-stack developer passionate about creating amazing experiences" />
     
     <!-- Open Graph / Discord -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sqrilizz.xyz/" />
     <meta property="og:site_name" content="Sqrilizz.xyz" />
-    <meta property="og:title" content="Sqrilizz.xyz" />
-    <meta property="og:description" content="Developer, Minecraft Modder & AI Engineer from Estonia | Enterntainment owner btw" />
-    <meta property="og:image" content="https://i.pinimg.com/originals/de/a6/8f/dea68fe6b41aeef969390bc5081ad63b.gif" />
-    <meta property="og:image:secure_url" content="https://i.pinimg.com/originals/de/a6/8f/dea68fe6b41aeef969390bc5081ad63b.gif" />
-    <meta property="og:image:type" content="image/gif" />
+    <meta property="og:title" content="Sqrilizz.xyz - Developer Portfolio" />
+    <meta property="og:description" content="Full-stack developer passionate about creating amazing experiences. React, Python, Java & AI." />
+    <meta property="og:image" content="https://i.pinimg.com/1200x/86/4e/6c/864e6cdcc23e38ccb68138d122cd464b.jpg" />
+    <meta property="og:image:secure_url" content="https://i.pinimg.com/1200x/86/4e/6c/864e6cdcc23e38ccb68138d122cd464b.jpg" />
+    <meta property="og:image:type" content="image/jpg" />
     <meta property="og:image:width" content="498" />
     <meta property="og:image:height" content="498" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sqrilizz.xyz" />
-    <meta name="twitter:description" content="Developer, Minecraft Modder & AI Engineer from Estonia | Enterntainment owner btw" />
+    <meta name="twitter:title" content="Sqrilizz.xyz - Developer Portfolio" />
+    <meta name="twitter:description" content="Full-stack developer passionate about creating amazing experiences. React, Python, Java & AI." />
     <meta name="twitter:image" content="https://i.pinimg.com/originals/de/a6/8f/dea68fe6b41aeef969390bc5081ad63b.gif" />
     
     <meta name="theme-color" content="#18181b" />
@@ -34,5 +34,53 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      (function() {
+        const domain = encodeURIComponent(window.location.hostname);
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const page_path = window.location.pathname;
+        const page_title = document.title;
+        const referrer = document.referrer;
+        
+        // Extract search query if coming from a search engine
+        let search_query = '';
+        if (referrer) {
+          try {
+            const url = new URL(referrer);
+            if (url.hostname.includes('google.com')) {
+              search_query = url.searchParams.get('q') || '';
+            } else if (url.hostname.includes('bing.com')) {
+              search_query = url.searchParams.get('q') || '';
+            } else if (url.hostname.includes('yahoo.com')) {
+              search_query = url.searchParams.get('p') || '';
+            } else if (url.hostname.includes('duckduckgo.com')) {
+              search_query = url.searchParams.get('q') || '';
+            }
+          } catch (e) {
+            // Invalid URL, ignore
+          }
+        }
+        
+        fetch('https://visitor.6developer.com/visit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            domain,
+            timezone,
+            page_path,
+            page_title,
+            referrer,
+            search_query
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Visitor count:', data);
+          // Dispatch custom event for React components to listen to
+          window.dispatchEvent(new CustomEvent('visitorCount', { detail: data }));
+        })
+        .catch(error => console.error('Error:', error));
+      })();
+    </script>
   </body>
 </html>

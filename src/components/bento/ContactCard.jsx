@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { FaTelegram, FaEnvelope, FaDiscord, FaInstagram } from 'react-icons/fa'
+import { FaTelegram, FaEnvelope, FaDiscord } from 'react-icons/fa'
 
 const contacts = [
   { 
@@ -19,12 +19,6 @@ const contacts = [
     label: 'Discord', 
     value: 'sqrilizz',
     href: '#'
-  },
-  { 
-    icon: FaInstagram, 
-    label: 'Instagram', 
-    value: '@Matve1m0k1',
-    href: 'https://instagram.com/Matve1m0k1'
   }
 ]
 
