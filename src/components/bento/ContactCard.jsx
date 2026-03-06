@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import { FaTelegram, FaEnvelope, FaDiscord } from 'react-icons/fa'
+import { Users } from 'lucide-react'
 
 const contacts = [
   { 
@@ -23,6 +25,20 @@ const contacts = [
 ]
 
 export default function ContactCard() {
+  const [visitorCount, setVisitorCount] = useState(0)
+
+  useEffect(() => {
+    const handleVisitorCount = (event) => {
+      setVisitorCount(event.detail.totalCount || 0)
+    }
+
+    window.addEventListener('visitorCount', handleVisitorCount)
+
+    return () => {
+      window.removeEventListener('visitorCount', handleVisitorCount)
+    }
+  }, [])
+
   return (
     <div className="h-full bg-zinc-900/20 backdrop-blur-xl rounded-2xl p-5 border border-zinc-800/50 hover:border-zinc-700 transition-all shadow-lg hover:shadow-xl hover:shadow-zinc-900/50 flex flex-col relative overflow-hidden group">
       {/* Subtle gradient overlay on hover */}
@@ -58,6 +74,22 @@ export default function ContactCard() {
             </div>
           </motion.a>
         ))}
+      </div>
+
+      {/* Visitor Counter */}
+      <div className="mt-4 pt-3 border-t border-zinc-800/50 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-2 text-zinc-500">
+          <Users className="w-3.5 h-3.5" />
+          <span className="text-xs">Visitors</span>
+        </div>
+        <motion.div
+          key={visitorCount}
+          initial={{ scale: 1.2, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-sm font-semibold text-white"
+        >
+          {visitorCount > 0 ? visitorCount.toLocaleString() : '...'}
+        </motion.div>
       </div>
       </div>
     </div>
