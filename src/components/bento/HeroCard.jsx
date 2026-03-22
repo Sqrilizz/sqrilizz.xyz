@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { FaGithub, FaTelegram, FaDiscord, FaGlobe, FaHeart } from 'react-icons/fa'
+import { FaGithub, FaTelegram, FaDiscord, FaGlobe } from 'react-icons/fa'
 import { SiModrinth } from 'react-icons/si'
 import { useState, useEffect } from 'react'
+import { useAge } from '../../hooks/useAge'
 
 export default function HeroCard() {
   const [avatar, setAvatar] = useState('/avatar.png')
   const [showCopied, setShowCopied] = useState(false)
   const [discordStatus, setDiscordStatus] = useState('offline')
+  const age = useAge('2011-07-09')
 
   const handleDiscordClick = (e) => {
     e.preventDefault()
@@ -15,8 +16,6 @@ export default function HeroCard() {
     setShowCopied(true)
     setTimeout(() => setShowCopied(false), 2000)
   }
-
-  // Status colors and labels
   const statusConfig = {
     online: { color: '#43b581', label: 'Online', glow: 'rgba(67, 181, 129, 0.3)' },
     idle: { color: '#faa61a', label: 'Idle', glow: 'rgba(250, 166, 26, 0.3)' },
@@ -25,16 +24,16 @@ export default function HeroCard() {
   }
 
   useEffect(() => {
-    // Listen for Discord updates
+
     const handleDiscordUpdate = (event) => {
       const data = event.detail
       
-      // Update status
+
       if (data.discord_status) {
         setDiscordStatus(data.discord_status)
       }
       
-      // Update avatar
+
       if (data.discord_user && data.discord_user.avatar) {
         const userId = data.discord_user.id
         const avatarHash = data.discord_user.avatar
@@ -107,20 +106,35 @@ export default function HeroCard() {
               Sqrilizz
             </motion.h1>
             <p className="text-zinc-400 mt-2">
-              Developer, Minecraft Modder & AI Engineer
+              Developer, Telegram enthusiast & AI Engineer
             </p>
-            <div className="flex items-center gap-2 mt-2 text-sm text-zinc-500">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span>Tallinn, Estonia</span>
+            <div className="flex items-center gap-4 mt-2 text-sm text-zinc-500">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+                <span>Tallinn, Estonia</span>
+              </div>
+              <div className="flex items-center gap-2 relative group/age cursor-default">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                </svg>
+                <span className="font-mono text-zinc-400">{Math.floor(age)} years old</span>
+                
+                {/* Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs font-mono text-white opacity-0 group-hover/age:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  {age.toFixed(10)} years old
+                  {/* Arrow */}
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-zinc-800"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Banner Image */}
         <motion.div 
-          className="my-4 rounded-xl overflow-hidden border border-zinc-800 shadow-lg"
+          className="my-4 rounded-xl overflow-hidden border border-zinc-800 shadow-lg bg-zinc-900/50"
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
@@ -130,6 +144,11 @@ export default function HeroCard() {
             className="w-full h-[140px] object-cover"
             onError={(e) => {
               e.target.style.display = 'none'
+              e.target.parentElement.classList.add('flex', 'items-center', 'justify-center')
+              const placeholder = document.createElement('div')
+              placeholder.className = 'text-zinc-600 text-sm'
+              placeholder.textContent = 'No banner'
+              e.target.parentElement.appendChild(placeholder)
             }}
           />
         </motion.div>
@@ -156,55 +175,6 @@ export default function HeroCard() {
               <social.icon size={18} />
             </motion.a>
           ))}
-          
-          {/* Donate Link */}
-          <Link to="/donate">
-            <motion.div
-              className="w-10 h-10 rounded-lg bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:text-pink-300 hover:border-pink-500/50 hover:bg-pink-500/20 transition-colors relative"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{ 
-                boxShadow: [
-                  '0 0 0 0 rgba(236, 72, 153, 0.4)',
-                  '0 0 0 8px rgba(236, 72, 153, 0)',
-                  '0 0 0 0 rgba(236, 72, 153, 0)'
-                ]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <FaHeart size={18} />
-              {/* Pulse dot */}
-              <motion.div
-                className="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full"
-                animate={{ 
-                  scale: [1, 1.3, 1],
-                  opacity: [1, 0.5, 1]
-                }}
-                transition={{ 
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </motion.div>
-          </Link>
-          
-          {/* Favorites Link */}
-          <Link to="/favorites">
-            <motion.div
-              className="w-10 h-10 rounded-lg bg-zinc-800/50 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 transition-colors"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
-              </svg>
-            </motion.div>
-          </Link>
         </div>
       </div>
 

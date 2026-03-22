@@ -66,25 +66,41 @@ body {
   animation: glitch 0.3s ease-in-out;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Custom scrollbar - только для body и основных контейнеров */
+body::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+body::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(251, 146, 60, 0.3);
-  border-radius: 4px;
-  transition: background 0.2s;
+body::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.4) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(251, 146, 60, 0.5);
+body::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.6) !important;
+  box-shadow: 0 0 6px rgba(161, 161, 170, 0.4) !important;
+}
+
+body::-webkit-scrollbar-thumb:active,
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background: rgba(212, 212, 216, 0.8) !important;
+  box-shadow: 0 0 8px rgba(212, 212, 216, 0.6) !important;
+}
+
+/* Firefox scrollbar - только для body */
+body {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(113, 113, 122, 0.4) transparent !important;
 }
 
 .music-equalizer {

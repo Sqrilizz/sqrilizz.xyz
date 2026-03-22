@@ -5,9 +5,9 @@ import { Howl } from 'howler'
 
 const playlist = [
   { 
-    title: 'Ты (you)', 
-    artist: 'Ksb Muzik', 
-    cover: '/music/covers/ksb.banner.png', 
+    title: 'Feel the way', 
+    artist: 'S3RL,No Hero & Ella', 
+    cover: '/public/sprite.png', 
     src: '/music/you.mp3' 
   }
 ]
@@ -20,10 +20,8 @@ export default function MusicCard() {
   const progressInterval = useRef(null)
 
   const track = playlist[currentTrack]
-
-  // Инициализация и очистка звука
   useEffect(() => {
-    // Создаем новый Howl объект при смене трека
+
     if (soundRef.current) {
       soundRef.current.unload()
     }
@@ -57,8 +55,6 @@ export default function MusicCard() {
       stopProgressUpdate()
     }
   }, [currentTrack])
-
-  // Обновление прогресса
   const startProgressUpdate = () => {
     stopProgressUpdate()
     progressInterval.current = setInterval(() => {
@@ -76,8 +72,6 @@ export default function MusicCard() {
       progressInterval.current = null
     }
   }
-
-  // Управление воспроизведением
   const togglePlay = () => {
     if (!soundRef.current) return
 

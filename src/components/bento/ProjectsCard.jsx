@@ -19,8 +19,6 @@ export default function ProjectsCard() {
     
     loadProjects()
   }, [])
-
-  // Автопрокрутка (вправо)
   useEffect(() => {
     if (!scrollRef.current || loading || isPaused || projects.length === 0) return
 
@@ -35,8 +33,6 @@ export default function ProjectsCard() {
       }
       animationFrameId = requestAnimationFrame(scroll)
     }
-
-    // Небольшая задержка для инициализации
     const timeoutId = setTimeout(() => {
       animationFrameId = requestAnimationFrame(scroll)
     }, 100)
@@ -91,8 +87,6 @@ export default function ProjectsCard() {
     </div>
   )
 }
-
-// Компонент карточки проекта
 function ProjectCard({ project }) {
   return (
     <motion.a

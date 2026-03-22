@@ -18,7 +18,6 @@ export default function DiscordCard() {
       ws = new WebSocket(DISCORD_CONFIG.LANYARD_WS)
 
       ws.onopen = () => {
-        console.log('Connected to Lanyard WebSocket')
         ws.send(JSON.stringify({
           op: 2,
           d: {
@@ -50,7 +49,13 @@ export default function DiscordCard() {
               setActivity(mainActivity)
               
               if (mainActivity) {
-                const imageUrl = getActivityImageUrl(mainActivity, 'large', 128)
+                let imageUrl = getActivityImageUrl(mainActivity, 'large', 128)
+                
+
+                if (imageUrl && imageUrl.includes('pd.premid.app')) {
+                  imageUrl = `https://wsrv.nl/?url=${encodeURIComponent(imageUrl)}&w=128&h=128&fit=cover`
+                }
+                
                 setActivityImage(imageUrl)
               } else {
                 setActivityImage(null)
@@ -58,7 +63,7 @@ export default function DiscordCard() {
               
               setSpotify(presenceData.listening_to_spotify ? presenceData.spotify : null)
               
-              // Dispatch event for avatar update
+
               window.dispatchEvent(new CustomEvent('discord-update', { 
                 detail: presenceData 
               }))
@@ -68,7 +73,6 @@ export default function DiscordCard() {
       }
 
       ws.onclose = () => {
-        console.log('Disconnected from Lanyard WebSocket')
         if (heartbeatInterval) {
           clearInterval(heartbeatInterval)
         }
@@ -76,7 +80,7 @@ export default function DiscordCard() {
       }
 
       ws.onerror = (error) => {
-        console.error('Lanyard WebSocket error:', error)
+
       }
     }
 
@@ -117,7 +121,7 @@ export default function DiscordCard() {
 
         {/* Activity or Spotify */}
         {spotify ? (
-          // Spotify Player
+
           <motion.div 
             className="flex-1 bg-gradient-to-br from-green-500/10 to-transparent rounded-xl p-3 border border-green-500/20 flex flex-col justify-center"
             style={{ marginLeft: '-8px', marginRight: '-8px' }}
@@ -149,7 +153,7 @@ export default function DiscordCard() {
             </div>
           </motion.div>
         ) : activity ? (
-          // Activity Display
+
           <motion.div 
             className="flex-1 bg-zinc-800/30 rounded-xl p-3 border border-zinc-800 flex items-center justify-center"
             style={{ marginLeft: '-8px', marginRight: '-8px' }}
@@ -168,14 +172,22 @@ export default function DiscordCard() {
                     alt={activity.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
+
                       e.target.style.display = 'none'
+
+                      const fallback = e.target.nextElementSibling
+                      if (fallback) fallback.style.display = 'block'
                     }}
                   />
-                ) : (
-                  <svg className="w-6 h-6 text-zinc-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clipRule="evenodd" />
-                  </svg>
-                )}
+                ) : null}
+                <svg 
+                  className="w-6 h-6 text-zinc-600" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                  style={{ display: activityImage ? 'none' : 'block' }}
+                >
+                  <path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clipRule="evenodd" />
+                </svg>
               </motion.div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-white font-medium text-sm truncate">{activity.name}</h4>
@@ -189,7 +201,7 @@ export default function DiscordCard() {
             </div>
           </motion.div>
         ) : (
-          // No Activity
+
           <div className="flex-1 flex flex-col items-center justify-center text-zinc-600">
             <svg className="w-8 h-8 mb-2 opacity-50" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />

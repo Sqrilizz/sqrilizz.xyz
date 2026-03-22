@@ -10,8 +10,6 @@ export function SettingsProvider({ children }) {
   const [notifications, setNotifications] = useState(true)
   const [animations, setAnimations] = useState(true)
   const [volume, setVolume] = useState(75)
-
-  // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem('sqrilizz-settings')
     if (savedSettings) {
@@ -23,27 +21,25 @@ export function SettingsProvider({ children }) {
         setAnimations(settings.animations ?? true)
         setVolume(settings.volume || 75)
         
-        // Apply language
+
         if (i18n && i18n.changeLanguage) {
           i18n.changeLanguage(settings.language || 'en')
         }
         
-        // Apply theme
+
         applyTheme(settings.theme || 'dark')
       } catch (e) {
         console.error('Failed to load settings:', e)
       }
     }
   }, [i18n])
-
-  // Save settings to localStorage whenever they change
   useEffect(() => {
     const settings = { theme, language, notifications, animations, volume }
     localStorage.setItem('sqrilizz-settings', JSON.stringify(settings))
   }, [theme, language, notifications, animations, volume])
 
   const applyTheme = (newTheme) => {
-    // Only dark theme supported for now
+
     const root = document.documentElement
     root.style.setProperty('--bg-primary', '#0a0a0a')
     root.style.setProperty('--bg-secondary', '#1a1a1a')
@@ -62,7 +58,7 @@ export function SettingsProvider({ children }) {
     if (i18n && i18n.changeLanguage) {
       i18n.changeLanguage(newLang).then(() => {
         console.log('Language changed successfully to:', newLang)
-        // Show notification
+
         const langNames = {
           en: 'English',
           ru: 'Русский',

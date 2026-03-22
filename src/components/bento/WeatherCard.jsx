@@ -9,7 +9,7 @@ export default function WeatherCard() {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        // Call Open-Meteo API directly (no backend needed)
+
         const TALLINN_LAT = '59.437'
         const TALLINN_LON = '24.7536'
         
@@ -23,7 +23,7 @@ export default function WeatherCard() {
         
         const data = await response.json()
         
-        // Weather code mapping (WMO Weather interpretation codes)
+
         const getWeatherDescription = (code) => {
           const weatherCodes = {
             0: 'Clear sky',
@@ -53,8 +53,6 @@ export default function WeatherCard() {
           }
           return weatherCodes[code] || 'Unknown'
         }
-
-        // Convert weather code to icon number
         const getWeatherIcon = (code) => {
           if (code === 0 || code === 1) return 800 // Clear
           if (code === 2 || code === 3) return 801 // Clouds
@@ -70,7 +68,7 @@ export default function WeatherCard() {
 
         const weatherCode = data.current.weather_code
         
-        // Format to match expected structure
+
         const formatted = {
           Temperature: {
             Metric: {
@@ -91,13 +89,13 @@ export default function WeatherCard() {
     }
 
     fetchWeather()
-    // Обновляем каждые 30 минут
+
     const interval = setInterval(fetchWeather, 30 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
   const getWeatherIcon = (iconNumber) => {
-    // OpenWeatherMap icon codes (weather condition IDs)
+
     if (iconNumber >= 200 && iconNumber < 300) return <WiThunderstorm size={32} /> // Thunderstorm
     if (iconNumber >= 300 && iconNumber < 600) return <WiRain size={32} /> // Drizzle/Rain
     if (iconNumber >= 600 && iconNumber < 700) return <WiSnow size={32} /> // Snow
