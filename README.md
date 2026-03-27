@@ -1,60 +1,46 @@
-# Sqrilizz.xyz
+# Portfolio Template
 
-My website
+![Preview](hyperbater.png)
 
-## Features
+Bento grid portfolio with Discord status, projects, music player, and more.
 
-- Bento Grid Layout
-- Real-time Discord Status (Lanyard API)
-- Auto Project Sync (GitHub & Modrinth)
-- Music Player
-- Weather Widget
-- Terminal Card
-- Smooth Animations (Framer Motion)
+## Setup
 
-
-## Configuration
-
-### Personal Info
-Edit `src/components/bento/HeroCard.jsx` - update name, birthdate, location, social links
-
-### Discord
-Edit `src/config/discord.js`:
-```js
-USER_ID: 'your_discord_id'
-CUSTOM_BANNER: 'your_banner_url'
+```bash
+npm install
+npm run dev
 ```
 
-### Projects
-Edit `src/config/projects.js`:
-```js
-GITHUB_USERNAME: 'your_username'
-MODRINTH_USERNAME: 'your_username'
-```
+## Config
 
-### Music
-Edit `src/components/bento/MusicCard.jsx` - add your tracks
+`src/components/bento/HeroCard.jsx` - name, birthdate, bio, links
 
-### Skills
-Edit `src/components/bento/SkillsCard.jsx` - customize tech stack
+`src/config/discord.js` - Discord user ID and banner
 
-### Meta Tags
-Edit `index.html` - update title, description, og:image
+`src/config/projects.js` - GitHub/Modrinth usernames
 
-## Environment Variables
+`src/components/bento/MusicCard.jsx` - music tracks
 
-Create `.env.local`:
+`src/components/bento/SkillsCard.jsx` - tech stack icons
+
+`index.html` - meta tags and og:image
+
+## Environment
+
+`.env.local`:
 ```env
-VITE_ACCUWEATHER_API_KEY=your_key
-VITE_MODRINTH_TOKEN=your_token
+VITE_ACCUWEATHER_API_KEY=
+VITE_MODRINTH_TOKEN=
 ```
 
-## Build
+## Visitor Counter (Optional)
+
+[Setup guide](docs/VISITOR_COUNTER.md) - requires Vercel KV
+
+## Deploy
 
 ```bash
 npm run build
 ```
 
-## Deploy
-
-Works with Vercel, Netlify, or any static host. Add environment variables in your hosting dashboard.
+Vercel, Netlify, or any static host.
