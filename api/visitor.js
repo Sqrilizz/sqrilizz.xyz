@@ -6,7 +6,16 @@ export const config = {
 
 export default async function handler(request) {
   try {
-    const count = await kv.incr('visitor_count')
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    const visitorKey = `visitor:${ip}`
+    
+    const isNewVisitor = await kv.set(visitorKey, '1', { ex: 86400, nx: true })
+    
+    if (isNewVisitor) {
+      await kv.incr('visitor_count')
+    }
+    
+    const count = await kv.get('visitor_count') || 0
     
     return new Response(
       JSON.stringify({
