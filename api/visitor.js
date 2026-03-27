@@ -9,7 +9,7 @@ export default async function handler(request) {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const visitorKey = `visitor:${ip}`
     
-    const isNewVisitor = await kv.set(visitorKey, '1', { ex: 86400, nx: true })
+    const isNewVisitor = await kv.set(visitorKey, '1', { nx: true })
     
     if (isNewVisitor) {
       await kv.incr('visitor_count')
