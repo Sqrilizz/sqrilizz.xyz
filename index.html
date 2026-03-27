@@ -26,6 +26,18 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      fetch('/api/visitor', {
+        method: 'GET'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.dispatchEvent(new CustomEvent('visitorCount', { detail: data }))
+        }
+      })
+      .catch(() => {})
+    </script>
     <script data-goatcounter="https://sqrilizz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   </body>
 </html>
