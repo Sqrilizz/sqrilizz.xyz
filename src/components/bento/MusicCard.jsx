@@ -7,7 +7,7 @@ const playlist = [
   { 
     title: 'Feel the way', 
     artist: 'S3RL,No Hero & Ella', 
-    cover: '/public/sprite.png', 
+    cover: '/music/covers/sprite.png', 
     src: '/music/you.mp3' 
   }
 ]

@@ -26,48 +26,6 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-      (function() {
-        const domain = encodeURIComponent(window.location.hostname);
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const page_path = window.location.pathname;
-        const page_title = document.title;
-        const referrer = document.referrer;
-        
-        let search_query = '';
-        if (referrer) {
-          try {
-            const url = new URL(referrer);
-            if (url.hostname.includes('google.com')) {
-              search_query = url.searchParams.get('q') || '';
-            } else if (url.hostname.includes('bing.com')) {
-              search_query = url.searchParams.get('q') || '';
-            } else if (url.hostname.includes('yahoo.com')) {
-              search_query = url.searchParams.get('p') || '';
-            } else if (url.hostname.includes('duckduckgo.com')) {
-              search_query = url.searchParams.get('q') || '';
-            }
-          } catch (e) {}
-        }
-        
-        fetch('https://visitor.6developer.com/visit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            domain,
-            timezone,
-            page_path,
-            page_title,
-            referrer,
-            search_query
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          window.dispatchEvent(new CustomEvent('visitorCount', { detail: data }));
-        })
-        .catch(() => {});
-      })();
-    </script>
+    <script data-goatcounter="https://sqrilizz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   </body>
 </html>
