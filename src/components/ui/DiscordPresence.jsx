@@ -4,12 +4,32 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DISCORD_CONFIG, getMainActivity, getActivityImageUrl } from '../../config/discord'
 
+function useElapsed(timestamp) {
+  const [elapsed, setElapsed] = useState('')
+  useEffect(() => {
+    if (!timestamp) { setElapsed(''); return }
+    const update = () => {
+      const diff = Date.now() - timestamp
+      const s = Math.floor(diff / 1000) % 60
+      const m = Math.floor(diff / 60000) % 60
+      const h = Math.floor(diff / 3600000)
+      setElapsed(h > 0 ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`)
+    }
+    update()
+    const id = setInterval(update, 1000)
+    return () => clearInterval(id)
+  }, [timestamp])
+  return elapsed
+}
+
 export default function DiscordPresence() {
   const { t } = useTranslation()
   const [status, setStatus] = useState('offline')
   const [activity, setActivity] = useState(null)
   const [activityImage, setActivityImage] = useState(null)
   const [spotify, setSpotify] = useState(null)
+  const activityElapsed = useElapsed(activity?.timestamps?.start)
+  const spotifyElapsed = useElapsed(spotify?.timestamps?.start)
 
   useEffect(() => {
     let ws = null
@@ -102,6 +122,7 @@ export default function DiscordPresence() {
           <div className="min-w-0">
             <p className="text-white text-sm font-medium truncate">{spotify.song}</p>
             <p className="text-zinc-500 text-xs truncate">{spotify.artist}</p>
+            {spotifyElapsed && <p className="text-zinc-700 text-[10px] font-mono mt-0.5">{spotifyElapsed} elapsed</p>}
           </div>
         </div>
       </motion.div>
@@ -126,6 +147,7 @@ export default function DiscordPresence() {
           <p className="text-white text-sm font-medium truncate">{activity.name}</p>
           {activity.details && <p className="text-zinc-500 text-xs truncate">{activity.details}</p>}
           {activity.state && <p className="text-zinc-600 text-xs truncate">{activity.state}</p>}
+          {activityElapsed && <p className="text-zinc-700 text-[10px] font-mono mt-0.5">{activityElapsed} elapsed</p>}
         </div>
       </div>
     </motion.div>
