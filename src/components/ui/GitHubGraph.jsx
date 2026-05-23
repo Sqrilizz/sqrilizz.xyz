@@ -5,9 +5,13 @@ function formatEvent(event) {
   const repo = event.repo?.name?.split('/')[1] || event.repo?.name
   switch (event.type) {
     case 'PushEvent': {
-      const count = event.payload?.size || event.payload?.commits?.length || 0
-      if (count === 0) return { icon: '⬆', text: `pushed to ${repo}` }
-      return { icon: '⬆', text: `pushed ${count} commit${count > 1 ? 's' : ''} to ${repo}` }
+      const commits = event.payload?.commits || []
+      const lastCommit = commits[commits.length - 1]
+      if (lastCommit?.message) {
+        const msg = lastCommit.message.split('\n')[0].slice(0, 40)
+        return { icon: '⬆', text: `${msg} → ${repo}` }
+      }
+      return { icon: '⬆', text: `pushed to ${repo}` }
     }
     case 'CreateEvent':
       return { icon: '✦', text: `created ${event.payload?.ref_type || 'repo'} ${event.payload?.ref || repo}` }
@@ -207,7 +211,7 @@ export default function GitHubGraph() {
               return (
                 <div
                   key={row}
-                  className={`w-[10px] h-[10px] rounded-[2px] transition-all duration-150 ${
+                  className={`w-[14px] h-[14px] rounded-[2px] transition-all duration-150 ${
                     isSnake
                       ? isHead
                         ? 'bg-white scale-125'

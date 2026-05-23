@@ -72,7 +72,7 @@ function MarqueeRow({ items, direction }) {
   const animDir = direction === 'left' ? 'marquee-left' : 'marquee-right'
 
   return (
-    <div className="overflow-hidden mb-3 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+    <div className="overflow-hidden mb-3 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] w-full">
       <div className={`flex gap-3 w-max animate-${animDir} hover:[animation-play-state:paused]`}>
         {doubled.map((project, i) => (
           <ProjectCard key={project.title + i} project={project} />
@@ -110,7 +110,7 @@ export default function ProjectsSection() {
 
   return (
     <section id="projects" className="py-24 px-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <motion.h2
           className="text-2xl font-semibold text-white mb-10"
           initial={{ opacity: 0, y: 24 }}

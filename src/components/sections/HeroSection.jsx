@@ -4,7 +4,6 @@ import { SiModrinth } from 'react-icons/si'
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import WeatherWidget from '../ui/WeatherWidget'
-import MiniPlayer from '../ui/MiniPlayer'
 import GitHubGraph from '../ui/GitHubGraph'
 
 const ROLES = ['developer', 'minecraft modder', 'bot builder', 'arch user', 'open source enthusiast']
@@ -158,7 +157,6 @@ export default function HeroSection() {
           </div>
 
           <div className="flex items-start gap-6 w-full">
-            <MiniPlayer />
             <GitHubGraph />
           </div>
         </motion.div>
