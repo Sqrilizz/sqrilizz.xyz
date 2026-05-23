@@ -7,11 +7,8 @@ function formatEvent(event) {
     case 'PushEvent': {
       const commits = event.payload?.commits || []
       const lastCommit = commits[commits.length - 1]
-      if (lastCommit?.message) {
-        const msg = lastCommit.message.split('\n')[0].slice(0, 40)
-        return { icon: '⬆', text: `${msg} → ${repo}` }
-      }
-      return { icon: '⬆', text: `pushed to ${repo}` }
+      const msg = lastCommit?.message?.split('\n')[0]?.slice(0, 50)
+      return { icon: '⬆', text: msg || `pushed to ${repo}`, sub: repo }
     }
     case 'CreateEvent':
       return { icon: '✦', text: `created ${event.payload?.ref_type || 'repo'} ${event.payload?.ref || repo}` }
@@ -50,6 +47,7 @@ export default function GitHubGraph() {
   const [weekCommits, setWeekCommits] = useState(0)
   const [topRepo, setTopRepo] = useState(null)
   const [events, setEvents] = useState([])
+  const [commits, setCommits] = useState([])
 
   const ROWS = 7
   const USERNAME = 'Sqrilizz'
@@ -91,17 +89,32 @@ export default function GitHubGraph() {
       })
       .catch(() => setLoading(false))
 
-    fetch(`https://api.github.com/users/${USERNAME}/repos?sort=stars&per_page=1`)
+    const headers = {}
+    const ghToken = import.meta.env.VITE_GITHUB_TOKEN
+    if (ghToken) headers.Authorization = `token ${ghToken}`
+
+    fetch(`https://api.github.com/users/${USERNAME}/repos?sort=stars&per_page=1`, { headers })
       .then(r => r.json())
       .then(repos => {
-        if (repos.length > 0) setTopRepo(repos[0])
+        if (Array.isArray(repos) && repos.length > 0) setTopRepo(repos[0])
       })
       .catch(() => {})
 
-    fetch(`https://api.github.com/users/${USERNAME}/events/public?per_page=5`)
+    fetch(`https://api.github.com/users/${USERNAME}/events/public?per_page=5`, { headers })
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) setEvents(data.slice(0, 5))
+        const pushRepos = [...new Set(
+          (Array.isArray(data) ? data : []).filter(e => e.type === 'PushEvent').map(e => e.repo?.name).filter(Boolean)
+        )].slice(0, 3)
+        Promise.all(
+          pushRepos.map(repo =>
+            fetch(`https://api.github.com/repos/${repo}/commits?per_page=3`, { headers })
+              .then(r => r.json())
+              .then(d => (Array.isArray(d) ? d : []).map(c => ({ message: c.commit?.message?.split('\n')[0], repo: repo.split('/')[1], date: c.commit?.author?.date })))
+              .catch(() => [])
+          )
+        ).then(all => setCommits(all.flat().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5)))
       })
       .catch(() => {})
   }, [])
@@ -110,54 +123,77 @@ export default function GitHubGraph() {
     if (!grid.length) return
 
     const cols = grid.length
-    let pos = { x: 0, y: 3 }
+    let pos = { x: 0, y: Math.floor(ROWS / 2) }
     let dir = { x: 1, y: 0 }
     let path = [{ ...pos }]
     let steps = 0
 
-    const interval = setInterval(() => {
-      let nextX = pos.x + dir.x
-      let nextY = pos.y + dir.y
+    const visited = new Set()
+    const key = (x, y) => `${x},${y}`
 
-      if (nextX < 0 || nextX >= cols || nextY < 0 || nextY >= ROWS) {
-        if (dir.x !== 0) {
-          dir = { x: 0, y: pos.y < ROWS / 2 ? 1 : -1 }
-        } else {
-          dir = { x: 1, y: 0 }
+    const isValid = (x, y) => x >= 0 && x < cols && y >= 0 && y < ROWS
+
+    const interval = setInterval(() => {
+      const dirs = [
+        { x: dir.x, y: dir.y },
+        { x: -dir.y, y: dir.x },
+        { x: dir.y, y: -dir.x },
+      ]
+
+      let moved = false
+      for (const d of dirs) {
+        const nx = pos.x + d.x
+        const ny = pos.y + d.y
+        if (isValid(nx, ny) && !visited.has(key(nx, ny))) {
+          dir = d
+          pos = { x: nx, y: ny }
+          moved = true
+          break
         }
-        nextX = pos.x + dir.x
-        nextY = pos.y + dir.y
       }
 
-      if (nextX < 0 || nextX >= cols || nextY < 0 || nextY >= ROWS) {
+      if (!moved) {
+        for (const d of dirs) {
+          const nx = pos.x + d.x
+          const ny = pos.y + d.y
+          if (isValid(nx, ny)) {
+            dir = d
+            pos = { x: nx, y: ny }
+            moved = true
+            break
+          }
+        }
+      }
+
+      if (!moved) {
         clearInterval(interval)
+        setSnake([])
+        setTimeout(() => startSnake(grid), 1500)
         return
       }
 
-      pos = { x: nextX, y: nextY }
-      path = [...path, { ...pos }].slice(-8)
+      visited.add(key(pos.x, pos.y))
+      if (visited.size > cols * ROWS * 0.6) visited.clear()
+
+      path = [...path, { ...pos }].slice(-6)
       setSnake([...path])
 
-      steps++
-      if (steps > cols * ROWS) {
-        clearInterval(interval)
-        setTimeout(() => startSnake(grid), 2000)
+      if (Math.random() < 0.25) {
+        const turn = Math.random() < 0.5
+          ? { x: -dir.y, y: dir.x }
+          : { x: dir.y, y: -dir.x }
+        if (isValid(pos.x + turn.x, pos.y + turn.y)) {
+          dir = turn
+        }
       }
 
-      if (Math.random() < 0.3) {
-        const options = []
-        if (dir.x !== 0) {
-          if (pos.y > 0) options.push({ x: 0, y: -1 })
-          if (pos.y < ROWS - 1) options.push({ x: 0, y: 1 })
-        } else {
-          if (pos.x < cols - 1) options.push({ x: 1, y: 0 })
-          if (pos.x > 0) options.push({ x: -1, y: 0 })
-        }
-        if (options.length > 0) {
-          dir = options[Math.floor(Math.random() * options.length)]
-        }
+      steps++
+      if (steps > cols * ROWS * 2) {
+        clearInterval(interval)
+        setSnake([])
+        setTimeout(() => startSnake(grid), 1500)
       }
-    }, 150)
+    }, 120)
 
     return () => clearInterval(interval)
   }
@@ -200,45 +236,45 @@ export default function GitHubGraph() {
           </a>
         )}
       </div>
-      <div className="flex gap-[3px]">
-        {weeks.map((week, col) => (
-          <div key={col} className="flex flex-col gap-[3px]">
-            {week.map((count, row) => {
-              const isSnake = isSnakeCell(col, row)
-              const snakeIdx = getSnakeIndex(col, row)
-              const isHead = snakeIdx === snake.length - 1
+      <div className="flex gap-4">
+        <div className="flex gap-[3px] flex-shrink-0">
+          {weeks.map((week, col) => (
+            <div key={col} className="flex flex-col gap-[3px]">
+              {week.map((count, row) => {
+                const isSnake = isSnakeCell(col, row)
+                const snakeIdx = getSnakeIndex(col, row)
+                const isHead = snakeIdx === snake.length - 1
 
-              return (
-                <div
-                  key={row}
-                  className={`w-[14px] h-[14px] rounded-[2px] transition-all duration-150 ${
-                    isSnake
-                      ? isHead
-                        ? 'bg-white scale-125'
-                        : 'bg-violet-400/80'
-                      : getColor(count)
-                  }`}
-                />
-              )
-            })}
-          </div>
-        ))}
-      </div>
-
-      {events.length > 0 && (
-        <div className="mt-3 space-y-1">
-          {events.map((event, i) => {
-            const { icon, text } = formatEvent(event)
-            return (
-              <div key={i} className="flex items-center gap-2 text-[11px]">
-                <span className="text-zinc-600 w-3 text-center flex-shrink-0">{icon}</span>
-                <span className="text-zinc-500 truncate">{text}</span>
-                <span className="text-zinc-700 ml-auto flex-shrink-0">{timeAgo(event.created_at)}</span>
-              </div>
-            )
-          })}
+                return (
+                  <div
+                    key={row}
+                    className={`w-[14px] h-[14px] rounded-[2px] transition-all duration-150 ${
+                      isSnake
+                        ? isHead
+                          ? 'bg-white scale-125'
+                          : 'bg-violet-400/80'
+                        : getColor(count)
+                    }`}
+                  />
+                )
+              })}
+            </div>
+          ))}
         </div>
-      )}
+
+        {commits.length > 0 && (
+          <div className="space-y-1.5 min-w-0 pt-0.5">
+            {commits.map((c, i) => (
+              <div key={i} className="flex items-center gap-2 text-[11px]">
+                <span className="text-zinc-600 w-3 text-center flex-shrink-0">⬆</span>
+                <span className="text-zinc-400 truncate">{c.message}</span>
+                <span className="text-zinc-700 flex-shrink-0">· {c.repo}</span>
+                <span className="text-zinc-700 ml-auto flex-shrink-0">{timeAgo(c.date)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
