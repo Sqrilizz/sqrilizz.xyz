@@ -8,14 +8,12 @@ html, body, #root {
 
 body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: linear-gradient(135deg, #060611 0%, #01010e 100%);
-  color: #e0e0e0;
+  background: #09090b;
+  color: #e4e4e7;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(113, 113, 122, 0.3) transparent;
 }
 
-/* small helper classes used in components */
-.card { @apply bg-[rgba(14,16,29,0.95)] rounded-2xl p-6; }
-
-/* Text truncation utilities */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -23,107 +21,41 @@ body {
   overflow: hidden;
 }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+::selection {
+  background: rgba(139, 92, 246, 0.25);
 }
 
-/* Кастомные анимации для музыкального плеера */
-@keyframes equalizer {
-  0%, 100% { height: 6px; }
-  50% { height: 18px; }
+body::-webkit-scrollbar {
+  width: 6px;
 }
 
-@keyframes smooth-equalizer {
-  0%, 100% { 
-    transform: scaleY(0.6);
-    opacity: 0.7;
-  }
-  50% { 
-    transform: scaleY(1.2);
-    opacity: 1;
-  }
+body::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(168, 85, 247, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 30px rgba(168, 85, 247, 0.4); }
+body::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.3);
+  border-radius: 10px;
 }
 
-/* Glitch effect for boot screen */
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.5);
 }
 
-.glitch {
-  animation: glitch 0.3s ease-in-out;
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-/* Custom scrollbar - только для body и основных контейнеров */
-body::-webkit-scrollbar,
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px !important;
-  height: 6px !important;
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
 }
 
-body::-webkit-scrollbar-track,
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent !important;
+.animate-marquee-left {
+  animation: marquee-left 40s linear infinite;
 }
 
-body::-webkit-scrollbar-thumb,
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(113, 113, 122, 0.4) !important;
-  border-radius: 10px !important;
-  transition: all 0.3s ease !important;
-}
-
-body::-webkit-scrollbar-thumb:hover,
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(161, 161, 170, 0.6) !important;
-  box-shadow: 0 0 6px rgba(161, 161, 170, 0.4) !important;
-}
-
-body::-webkit-scrollbar-thumb:active,
-.custom-scrollbar::-webkit-scrollbar-thumb:active {
-  background: rgba(212, 212, 216, 0.8) !important;
-  box-shadow: 0 0 8px rgba(212, 212, 216, 0.6) !important;
-}
-
-/* Firefox scrollbar - только для body */
-body {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(113, 113, 122, 0.4) transparent !important;
-}
-
-.music-equalizer {
-  animation: equalizer 0.8s ease-in-out infinite;
-}
-
-.smooth-equalizer {
-  animation: smooth-equalizer ease-in-out infinite;
-  transform-origin: bottom;
-}
-
-.music-glow {
-  animation: glow 2s ease-in-out infinite;
-}
-
-/* Pulse animation for desktop background */
-@keyframes pulse {
-  0%, 100% { 
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.4;
-    transform: scale(1.05);
-  }
+.animate-marquee-right {
+  animation: marquee-right 40s linear infinite;
 }
