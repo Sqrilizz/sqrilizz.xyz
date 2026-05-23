@@ -57,17 +57,15 @@ export default function ContactSection() {
           ))}
         </motion.div>
 
-        {visitorCount > 0 && (
-          <motion.p
-            className="mt-10 text-sm text-zinc-700"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
-            {visitorCount.toLocaleString()} {t('visitors')}
-          </motion.p>
-        )}
+        <motion.p
+          className="mt-10 text-sm text-zinc-700"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+        >
+          {visitorCount > 0 ? visitorCount.toLocaleString() : '...'} {t('visitors')}
+        </motion.p>
       </div>
     </section>
   )

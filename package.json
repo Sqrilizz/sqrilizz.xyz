@@ -30,7 +30,7 @@
     "react-i18next": "^13.5.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.30.1",
-    "vercel": "^50.17.1"
+    "vercel": "^50.44.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
