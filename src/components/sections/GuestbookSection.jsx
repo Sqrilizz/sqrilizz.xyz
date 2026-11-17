@@ -112,10 +112,137 @@ function getDeterministicPosition(index, id) {
   const row = Math.floor(index / cols);
   const jitterX = (seed % 9) - 4;
   const jitterY = ((seed >> 2) % 7) - 3;
-  const x = Math.max(5, Math.min(76, 8 + col * 28 + jitterX));
-  const y = Math.max(6, Math.min(74, 8 + (row % 4) * 22 + jitterY));
+  const x = Math.max(4, Math.min(68, 6 + col * 25 + jitterX));
+  const y = Math.max(6, Math.min(68, 8 + (row % 4) * 20 + jitterY));
   const rotation = (seed % 11) - 5;
   return { x, y, rotation };
+}
+
+function StickyNote({
+  note,
+  theme,
+  isMine,
+  isLiked,
+  boardRef,
+  onToggleLike,
+  onOpenEdit,
+  onDelete,
+  onMove,
+}) {
+  const noteRef = useRef(null);
+  const [dragKey, setDragKey] = useState(0);
+
+  const handleDragEnd = () => {
+    if (!noteRef.current || !boardRef.current) return;
+    const boardRect = boardRef.current.getBoundingClientRect();
+    const noteRect = noteRef.current.getBoundingClientRect();
+
+    if (!boardRect.width || !boardRect.height) return;
+
+    const newLeftPx = noteRect.left - boardRect.left;
+    const newTopPx = noteRect.top - boardRect.top;
+
+    const newX = Math.round(
+      Math.max(2, Math.min(68, (newLeftPx / boardRect.width) * 100)),
+    );
+    const newY = Math.round(
+      Math.max(2, Math.min(72, (newTopPx / boardRect.height) * 100)),
+    );
+
+    setDragKey((k) => k + 1);
+    onMove(note.id, newX, newY);
+  };
+
+  return (
+    <motion.div
+      key={`${note.id}-${dragKey}`}
+      ref={noteRef}
+      drag={isMine}
+      dragConstraints={boardRef}
+      dragElastic={0}
+      dragMomentum={false}
+      onDragEnd={isMine ? handleDragEnd : undefined}
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      whileHover={isMine ? { scale: 1.03, zIndex: 40 } : { zIndex: 30 }}
+      whileDrag={{ scale: 1.05, rotate: 0, zIndex: 50, cursor: "grabbing" }}
+      style={{
+        position: "absolute",
+        left: `${note.x}%`,
+        top: `${note.y}%`,
+        rotate: `${note.rotation}deg`,
+      }}
+      className={`group/note w-44 sm:w-52 p-3.5 sm:p-4 rounded-md border ${theme.bg} ${theme.border} ${theme.text} shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${
+        isMine
+          ? "cursor-grab active:cursor-grabbing hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)]"
+          : "cursor-default"
+      } transition-shadow select-none`}
+    >
+      <div
+        className={`absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-3.5 ${theme.tape} rounded-[1px] shadow-xs rotate-[-1deg] pointer-events-none`}
+      />
+
+      {isMine && (
+        <div className="absolute top-1 right-1 flex items-center gap-1 opacity-0 group-hover/note:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenEdit(note);
+            }}
+            aria-label="Edit note"
+            className="w-5 h-5 rounded flex items-center justify-center bg-black/10 hover:bg-black/20 text-black/70 hover:text-black transition-colors cursor-pointer"
+          >
+            <FaPencilAlt size={9} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(note.id);
+            }}
+            aria-label="Delete note"
+            className="w-5 h-5 rounded flex items-center justify-center bg-black/10 hover:bg-rose-500 hover:text-white text-black/70 transition-colors cursor-pointer"
+          >
+            <FaTrash size={9} />
+          </button>
+        </div>
+      )}
+
+      <p className="text-[13px] sm:text-sm font-sans font-normal leading-snug break-words whitespace-pre-line mb-3 mt-1 pointer-events-none">
+        {note.text}
+      </p>
+
+      <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-black/10 text-[10px]">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleLike(note.id);
+            }}
+            aria-label={isLiked ? "Unlike" : "Like"}
+            className={`inline-flex items-center gap-1 transition-transform active:scale-90 cursor-pointer ${
+              isLiked
+                ? "text-rose-600 font-semibold"
+                : "text-black/60 hover:text-black"
+            }`}
+          >
+            {isLiked ? (
+              <FaHeart size={10} className="text-rose-600" />
+            ) : (
+              <FaRegHeart size={10} />
+            )}
+            <span className="font-mono text-[10px]">{note.likes || 0}</span>
+          </button>
+          <span className="font-semibold truncate">{note.name}</span>
+        </div>
+        <span className={`font-mono shrink-0 ${theme.meta}`}>
+          {formatRelativeTime(note.date)}
+        </span>
+      </div>
+    </motion.div>
+  );
 }
 
 export default function GuestbookSection() {
@@ -151,8 +278,10 @@ export default function GuestbookSection() {
             const custom = storedPositions[note.id];
             return {
               ...note,
-              x: custom?.x ?? (typeof note.x === "number" ? note.x : fallback.x),
-              y: custom?.y ?? (typeof note.y === "number" ? note.y : fallback.y),
+              x:
+                custom?.x ?? (typeof note.x === "number" ? note.x : fallback.x),
+              y:
+                custom?.y ?? (typeof note.y === "number" ? note.y : fallback.y),
               rotation:
                 typeof note.rotation === "number"
                   ? note.rotation
@@ -228,50 +357,31 @@ export default function GuestbookSection() {
     } catch {}
   };
 
-  const handleDragEnd = (noteId, info) => {
-    if (!boardRef.current) return;
-    const rect = boardRef.current.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
+  const handleMove = (noteId, newX, newY) => {
+    setNotes((prev) =>
+      prev.map((n) => (n.id === noteId ? { ...n, x: newX, y: newY } : n)),
+    );
 
-    setNotes((prevNotes) => {
-      let nextX = null;
-      let nextY = null;
-      const nextNotes = prevNotes.map((n) => {
-        if (n.id !== noteId) return n;
-        const currentX = n.x ?? 20;
-        const currentY = n.y ?? 25;
-        const deltaXPercent = (info.offset.x / rect.width) * 100;
-        const deltaYPercent = (info.offset.y / rect.height) * 100;
-        nextX = Math.round(Math.max(3, Math.min(82, currentX + deltaXPercent)));
-        nextY = Math.round(Math.max(3, Math.min(76, currentY + deltaYPercent)));
-        return { ...n, x: nextX, y: nextY };
-      });
+    try {
+      const stored = getStoredPositions();
+      stored[noteId] = { x: newX, y: newY };
+      localStorage.setItem(STORAGE_POSITIONS_KEY, JSON.stringify(stored));
+    } catch {}
 
-      if (nextX !== null && nextY !== null) {
-        try {
-          const stored = getStoredPositions();
-          stored[noteId] = { x: nextX, y: nextY };
-          localStorage.setItem(STORAGE_POSITIONS_KEY, JSON.stringify(stored));
-        } catch {}
-
-        const secret = mySecrets[noteId];
-        if (secret) {
-          fetch("/api/guestbook", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              action: "move",
-              id: noteId,
-              secret,
-              x: nextX,
-              y: nextY,
-            }),
-          }).catch(() => {});
-        }
-      }
-
-      return nextNotes;
-    });
+    const secret = mySecrets[noteId];
+    if (secret) {
+      fetch("/api/guestbook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "move",
+          id: noteId,
+          secret,
+          x: newX,
+          y: newY,
+        }),
+      }).catch(() => {});
+    }
   };
 
   const handleDelete = async (noteId) => {
@@ -376,8 +486,8 @@ export default function GuestbookSection() {
       } else {
         if (!name.trim()) return;
 
-        const posX = Math.floor(Math.random() * 55) + 12;
-        const posY = Math.floor(Math.random() * 45) + 15;
+        const posX = Math.floor(Math.random() * 45) + 12;
+        const posY = Math.floor(Math.random() * 40) + 15;
 
         const response = await fetch("/api/guestbook", {
           method: "POST",
@@ -401,6 +511,8 @@ export default function GuestbookSection() {
           ...result.message,
           x: result.message?.x ?? posX,
           y: result.message?.y ?? posY,
+          rotation:
+            result.message?.rotation ?? Math.floor(Math.random() * 8) - 4,
         };
 
         setNotes((prev) => [newNoteWithPos, ...prev]);
@@ -420,7 +532,10 @@ export default function GuestbookSection() {
             );
             localStorage.setItem(STORAGE_USER_KEY, name.trim());
             const stored = getStoredPositions();
-            stored[result.message.id] = { x: newNoteWithPos.x, y: newNoteWithPos.y };
+            stored[result.message.id] = {
+              x: newNoteWithPos.x,
+              y: newNoteWithPos.y,
+            };
             localStorage.setItem(STORAGE_POSITIONS_KEY, JSON.stringify(stored));
           } catch {}
         }
@@ -506,109 +621,18 @@ export default function GuestbookSection() {
               const isLiked = likedIds.includes(note.id);
 
               return (
-                <motion.div
+                <StickyNote
                   key={note.id}
-                  drag={isMine}
-                  dragConstraints={boardRef}
-                  dragElastic={0.08}
-                  dragMomentum={false}
-                  onDragEnd={isMine ? (_e, info) => handleDragEnd(note.id, info) : undefined}
-                  initial={{
-                    scale: 0.8,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    scale: 1,
-                    opacity: 1,
-                    x: 0,
-                    y: 0,
-                  }}
-                  whileHover={isMine ? {
-                    scale: 1.04,
-                    zIndex: 40,
-                  } : { zIndex: 30 }}
-                  whileDrag={{
-                    scale: 1.08,
-                    rotate: 0,
-                    zIndex: 50,
-                    cursor: "grabbing",
-                  }}
-                  style={{
-                    position: "absolute",
-                    left: `${note.x}%`,
-                    top: `${note.y}%`,
-                    rotate: `${note.rotation}deg`,
-                  }}
-                  className={`group/note w-44 sm:w-52 p-3.5 sm:p-4 rounded-md border ${theme.bg} ${theme.border} ${theme.text} shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${isMine ? "cursor-grab active:cursor-grabbing hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)]" : "cursor-default"} transition-shadow`}
-                >
-                  <div
-                    className={`absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-3.5 ${theme.tape} rounded-[1px] shadow-xs rotate-[-1deg] pointer-events-none`}
-                  />
-
-                  {isMine && (
-                    <div className="absolute top-1 right-1 flex items-center gap-1 opacity-0 group-hover/note:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenEdit(note);
-                        }}
-                        aria-label="Edit note"
-                        className="w-5 h-5 rounded flex items-center justify-center bg-black/10 hover:bg-black/20 text-black/70 hover:text-black transition-colors cursor-pointer"
-                      >
-                        <FaPencilAlt size={9} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(note.id);
-                        }}
-                        aria-label="Delete note"
-                        className="w-5 h-5 rounded flex items-center justify-center bg-black/10 hover:bg-rose-500 hover:text-white text-black/70 transition-colors cursor-pointer"
-                      >
-                        <FaTrash size={9} />
-                      </button>
-                    </div>
-                  )}
-
-                  <p className="text-[13px] sm:text-sm font-sans font-normal leading-snug break-words whitespace-pre-line mb-3 mt-1">
-                    {note.text}
-                  </p>
-
-                  <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-black/10 text-[10px]">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleLike(note.id);
-                        }}
-                        aria-label={isLiked ? "Unlike" : "Like"}
-                        className={`inline-flex items-center gap-1 transition-transform active:scale-90 cursor-pointer ${
-                          isLiked
-                            ? "text-rose-600 font-semibold"
-                            : "text-black/60 hover:text-black"
-                        }`}
-                      >
-                        {isLiked ? (
-                          <FaHeart size={10} className="text-rose-600" />
-                        ) : (
-                          <FaRegHeart size={10} />
-                        )}
-                        <span className="font-mono text-[10px]">
-                          {note.likes || 0}
-                        </span>
-                      </button>
-                      <span className="font-semibold truncate">
-                        {note.name}
-                      </span>
-                    </div>
-                    <span className={`font-mono shrink-0 ${theme.meta}`}>
-                      {formatRelativeTime(note.date)}
-                    </span>
-                  </div>
-                </motion.div>
+                  note={note}
+                  theme={theme}
+                  isMine={isMine}
+                  isLiked={isLiked}
+                  boardRef={boardRef}
+                  onToggleLike={handleToggleLike}
+                  onOpenEdit={handleOpenEdit}
+                  onDelete={handleDelete}
+                  onMove={handleMove}
+                />
               );
             })
           )}
@@ -759,4 +783,3 @@ export default function GuestbookSection() {
     </section>
   );
 }
-
