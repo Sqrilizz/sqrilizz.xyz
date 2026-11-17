@@ -90,12 +90,32 @@ export default async function handler(request) {
   try {
     if (request.method === "GET") {
       const allNotes = await getAllStoredNotes();
+      let needSave = false;
       const publicNotes = allNotes
         .filter(
           (n) =>
             n && n.name && n.text && !containsBannedContent(n.name, n.text),
         )
-        .map(sanitizeNoteForPublic);
+        .map((n, index) => {
+          if (typeof n.x !== "number" || typeof n.y !== "number") {
+            const cols = 3;
+            const row = Math.floor(index / cols);
+            const col = index % cols;
+            n.x = Math.max(4, Math.min(75, 8 + col * 28 + ((n.id % 7) - 3)));
+            n.y = Math.max(
+              4,
+              Math.min(72, 8 + (row % 4) * 22 + (((n.id >> 2) % 7) - 3)),
+            );
+            n.rotation =
+              typeof n.rotation === "number" ? n.rotation : (n.id % 11) - 5;
+            needSave = true;
+          }
+          return sanitizeNoteForPublic(n);
+        });
+
+      if (needSave) {
+        saveAllNotes(allNotes).catch(() => {});
+      }
 
       return Response.json(
         { success: true, messages: publicNotes },
@@ -114,6 +134,46 @@ export default async function handler(request) {
 
     const body = await request.json();
     const ip = getClientIp(request);
+
+    if (body.action === "move") {
+      const id = Number(body.id);
+      const secret = body.secret;
+      const x = Number(body.x);
+      const y = Number(body.y);
+
+      if (
+        !Number.isFinite(id) ||
+        !secret ||
+        !Number.isFinite(x) ||
+        !Number.isFinite(y)
+      ) {
+        return Response.json(
+          { success: false, error: "Missing required fields" },
+          { status: 400 },
+        );
+      }
+
+      const allNotes = await getAllStoredNotes();
+      const target = allNotes.find((n) => n.id === id);
+      if (!target) {
+        return Response.json(
+          { success: false, error: "Note not found" },
+          { status: 404 },
+        );
+      }
+
+      if (target.secret && target.secret !== secret) {
+        return Response.json(
+          { success: false, error: "Unauthorized" },
+          { status: 403 },
+        );
+      }
+
+      target.x = Math.max(2, Math.min(85, Math.round(x)));
+      target.y = Math.max(2, Math.min(80, Math.round(y)));
+      await saveAllNotes(allNotes);
+      return Response.json({ success: true, id, x: target.x, y: target.y });
+    }
 
     if (body.action === "like") {
       const id = Number(body.id);

@@ -13,6 +13,7 @@ import {
 const STORAGE_USER_KEY = "stickynotes_user";
 const STORAGE_MY_SECRETS_KEY = "stickynotes_my_secrets";
 const STORAGE_LIKED_KEY = "stickynotes_liked";
+const STORAGE_POSITIONS_KEY = "stickynotes_positions";
 
 const NOTE_THEMES = {
   yellow: {
@@ -96,6 +97,27 @@ function getStoredLiked() {
   }
 }
 
+function getStoredPositions() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_POSITIONS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function getDeterministicPosition(index, id) {
+  const seed = Math.abs(Number(id) || index || 1);
+  const cols = 3;
+  const col = index % cols;
+  const row = Math.floor(index / cols);
+  const jitterX = (seed % 9) - 4;
+  const jitterY = ((seed >> 2) % 7) - 3;
+  const x = Math.max(5, Math.min(76, 8 + col * 28 + jitterX));
+  const y = Math.max(6, Math.min(74, 8 + (row % 4) * 22 + jitterY));
+  const rotation = (seed % 11) - 5;
+  return { x, y, rotation };
+}
+
 export default function GuestbookSection() {
   const { t, i18n } = useTranslation();
   const isRu = i18n.language?.startsWith("ru");
@@ -122,7 +144,23 @@ export default function GuestbookSection() {
         return res.json();
       })
       .then((data) => {
-        if (data.messages) setNotes(data.messages);
+        if (data.messages) {
+          const storedPositions = getStoredPositions();
+          const positionedNotes = data.messages.map((note, index) => {
+            const fallback = getDeterministicPosition(index, note.id);
+            const custom = storedPositions[note.id];
+            return {
+              ...note,
+              x: custom?.x ?? (typeof note.x === "number" ? note.x : fallback.x),
+              y: custom?.y ?? (typeof note.y === "number" ? note.y : fallback.y),
+              rotation:
+                typeof note.rotation === "number"
+                  ? note.rotation
+                  : fallback.rotation,
+            };
+          });
+          setNotes(positionedNotes);
+        }
       })
       .catch(() => {
         setErrorMessage(
@@ -182,7 +220,7 @@ export default function GuestbookSection() {
         }),
       });
       const data = await response.json();
-      if (response.ok && typeof data.likes === "number") {
+      if (data.success && typeof data.likes === "number") {
         setNotes((prev) =>
           prev.map((n) => (n.id === noteId ? { ...n, likes: data.likes } : n)),
         );
@@ -190,9 +228,60 @@ export default function GuestbookSection() {
     } catch {}
   };
 
+  const handleDragEnd = (noteId, info) => {
+    if (!boardRef.current) return;
+    const rect = boardRef.current.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    setNotes((prevNotes) => {
+      let nextX = null;
+      let nextY = null;
+      const nextNotes = prevNotes.map((n) => {
+        if (n.id !== noteId) return n;
+        const currentX = n.x ?? 20;
+        const currentY = n.y ?? 25;
+        const deltaXPercent = (info.offset.x / rect.width) * 100;
+        const deltaYPercent = (info.offset.y / rect.height) * 100;
+        nextX = Math.round(Math.max(3, Math.min(82, currentX + deltaXPercent)));
+        nextY = Math.round(Math.max(3, Math.min(76, currentY + deltaYPercent)));
+        return { ...n, x: nextX, y: nextY };
+      });
+
+      if (nextX !== null && nextY !== null) {
+        try {
+          const stored = getStoredPositions();
+          stored[noteId] = { x: nextX, y: nextY };
+          localStorage.setItem(STORAGE_POSITIONS_KEY, JSON.stringify(stored));
+        } catch {}
+
+        const secret = mySecrets[noteId];
+        if (secret) {
+          fetch("/api/guestbook", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "move",
+              id: noteId,
+              secret,
+              x: nextX,
+              y: nextY,
+            }),
+          }).catch(() => {});
+        }
+      }
+
+      return nextNotes;
+    });
+  };
+
   const handleDelete = async (noteId) => {
     const secret = mySecrets[noteId];
     if (!secret) return;
+
+    const confirmed = window.confirm(
+      isRu ? "Удалить этот стикер?" : "Delete this note?",
+    );
+    if (!confirmed) return;
 
     try {
       const response = await fetch("/api/guestbook", {
@@ -205,13 +294,9 @@ export default function GuestbookSection() {
         }),
       });
 
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error);
-      }
+      if (!response.ok) throw new Error("Delete failed");
 
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
-
       const nextSecrets = { ...mySecrets };
       delete nextSecrets[noteId];
       setMySecrets(nextSecrets);
@@ -220,26 +305,52 @@ export default function GuestbookSection() {
           STORAGE_MY_SECRETS_KEY,
           JSON.stringify(nextSecrets),
         );
+        const stored = getStoredPositions();
+        delete stored[noteId];
+        localStorage.setItem(STORAGE_POSITIONS_KEY, JSON.stringify(stored));
       } catch {}
     } catch {
-      setErrorMessage(
-        isRu ? "Не удалось удалить стикер" : "Failed to delete note",
-      );
+      alert(isRu ? "Не удалось удалить стикер" : "Failed to delete note");
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!text.trim() || submitting) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
 
     if (honeypot) return;
 
-    setErrorMessage("");
-    setSubmitting(true);
+    if (!name.trim()) {
+      setErrorMessage(
+        isRu ? "Пожалуйста, введи имя." : "Please enter your name.",
+      );
+      return;
+    }
 
+    if (text.trim().length < 2) {
+      setErrorMessage(
+        isRu
+          ? "Сообщение слишком короткое (минимум 2 символа)."
+          : "Message is too short (min 2 chars).",
+      );
+      return;
+    }
+
+    if (text.trim().length > 160) {
+      setErrorMessage(
+        isRu
+          ? "Сообщение слишком длинное (максимум 160 символов)."
+          : "Message is too long (max 160 chars).",
+      );
+      return;
+    }
+
+    setSubmitting(true);
     try {
       if (editingNote) {
         const secret = mySecrets[editingNote.id];
+        if (!secret) throw new Error("Unauthorized");
+
         const response = await fetch("/api/guestbook", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -254,7 +365,7 @@ export default function GuestbookSection() {
 
         const result = await response.json();
         if (!response.ok) {
-          throw new Error(result.error || "Edit failed");
+          throw new Error(result.error || "Update failed");
         }
 
         setNotes((prev) =>
@@ -265,6 +376,9 @@ export default function GuestbookSection() {
       } else {
         if (!name.trim()) return;
 
+        const posX = Math.floor(Math.random() * 55) + 12;
+        const posY = Math.floor(Math.random() * 45) + 15;
+
         const response = await fetch("/api/guestbook", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -273,6 +387,8 @@ export default function GuestbookSection() {
             text: text.trim(),
             color,
             honeypot,
+            x: posX,
+            y: posY,
           }),
         });
 
@@ -281,7 +397,13 @@ export default function GuestbookSection() {
           throw new Error(result.error || "Submit failed");
         }
 
-        setNotes((prev) => [result.message, ...prev]);
+        const newNoteWithPos = {
+          ...result.message,
+          x: result.message?.x ?? posX,
+          y: result.message?.y ?? posY,
+        };
+
+        setNotes((prev) => [newNoteWithPos, ...prev]);
         setText("");
         setIsComposerOpen(false);
 
@@ -297,6 +419,9 @@ export default function GuestbookSection() {
               JSON.stringify(nextSecrets),
             );
             localStorage.setItem(STORAGE_USER_KEY, name.trim());
+            const stored = getStoredPositions();
+            stored[result.message.id] = { x: newNoteWithPos.x, y: newNoteWithPos.y };
+            localStorage.setItem(STORAGE_POSITIONS_KEY, JSON.stringify(stored));
           } catch {}
         }
       }
@@ -335,8 +460,8 @@ export default function GuestbookSection() {
             </h2>
             <p className="text-xs text-zinc-500 mt-1">
               {isRu
-                ? "перетаскивай стикеры мышкой или оставь свой (ссылки запрещены)"
-                : "drag notes around or pin your own (no links allowed)"}
+                ? "перетаскивай свои стикеры или наклей новый (ссылки запрещены)"
+                : "drag your notes around or pin a new one (no links allowed)"}
             </p>
           </div>
 
@@ -383,10 +508,11 @@ export default function GuestbookSection() {
               return (
                 <motion.div
                   key={note.id}
-                  drag
+                  drag={isMine}
                   dragConstraints={boardRef}
-                  dragElastic={0.12}
+                  dragElastic={0.08}
                   dragMomentum={false}
+                  onDragEnd={isMine ? (_e, info) => handleDragEnd(note.id, info) : undefined}
                   initial={{
                     scale: 0.8,
                     opacity: 0,
@@ -394,11 +520,13 @@ export default function GuestbookSection() {
                   animate={{
                     scale: 1,
                     opacity: 1,
+                    x: 0,
+                    y: 0,
                   }}
-                  whileHover={{
+                  whileHover={isMine ? {
                     scale: 1.04,
                     zIndex: 40,
-                  }}
+                  } : { zIndex: 30 }}
                   whileDrag={{
                     scale: 1.08,
                     rotate: 0,
@@ -407,11 +535,11 @@ export default function GuestbookSection() {
                   }}
                   style={{
                     position: "absolute",
-                    left: `${note.x ?? 20}%`,
-                    top: `${note.y ?? 25}%`,
-                    rotate: `${note.rotation ?? 0}deg`,
+                    left: `${note.x}%`,
+                    top: `${note.y}%`,
+                    rotate: `${note.rotation}deg`,
                   }}
-                  className={`group/note w-44 sm:w-52 p-3.5 sm:p-4 rounded-md border ${theme.bg} ${theme.border} ${theme.text} shadow-[0_8px_20px_rgba(0,0,0,0.35)] cursor-grab active:cursor-grabbing transition-shadow hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)]`}
+                  className={`group/note w-44 sm:w-52 p-3.5 sm:p-4 rounded-md border ${theme.bg} ${theme.border} ${theme.text} shadow-[0_8px_20px_rgba(0,0,0,0.35)] ${isMine ? "cursor-grab active:cursor-grabbing hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)]" : "cursor-default"} transition-shadow`}
                 >
                   <div
                     className={`absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-3.5 ${theme.tape} rounded-[1px] shadow-xs rotate-[-1deg] pointer-events-none`}
@@ -484,151 +612,151 @@ export default function GuestbookSection() {
               );
             })
           )}
-
-          <AnimatePresence>
-            {isComposerOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50"
-              >
-                <motion.div
-                  initial={{ scale: 0.95, y: 10 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.95, y: 10 }}
-                  className="w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-2xl space-y-4"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-                    <h3 className="text-sm font-medium text-white">
-                      {editingNote
-                        ? isRu
-                          ? "Редактировать стикер"
-                          : "Edit sticky note"
-                        : isRu
-                          ? "Новый стикер"
-                          : "New sticky note"}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setIsComposerOpen(false)}
-                      className="text-zinc-500 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <FaTimes size={13} />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500">
-                      {isRu ? "Цвет:" : "Color:"}
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      {COLOR_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          onClick={() => setColor(opt.key)}
-                          className={`w-5 h-5 rounded-full ${opt.dot} transition-transform ${
-                            color === opt.key
-                              ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-110"
-                              : "opacity-75 hover:opacity-100"
-                          }`}
-                          aria-label={opt.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <div
-                      className="absolute opacity-0 pointer-events-none"
-                      aria-hidden="true"
-                      tabIndex={-1}
-                    >
-                      <input
-                        type="text"
-                        value={honeypot}
-                        onChange={(e) => setHoneypot(e.target.value)}
-                        tabIndex={-1}
-                        autoComplete="off"
-                      />
-                    </div>
-
-                    {!editingNote && (
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder={
-                          isRu ? "Твоё имя / ник" : "Your name / handle"
-                        }
-                        maxLength={25}
-                        required
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
-                      />
-                    )}
-
-                    <div className="relative">
-                      <textarea
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder={
-                          isRu
-                            ? "Напиши что-нибудь классное... (без ссылок)"
-                            : "Write a quick note... (no links)"
-                        }
-                        maxLength={140}
-                        rows={3}
-                        required
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors resize-none"
-                      />
-                      <span className="absolute bottom-2 right-2.5 text-[10px] font-mono text-zinc-600">
-                        {text.length}/140
-                      </span>
-                    </div>
-
-                    {errorMessage && (
-                      <p className="text-xs text-rose-400">{errorMessage}</p>
-                    )}
-
-                    <div className="flex items-center justify-end gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setIsComposerOpen(false)}
-                        className="px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                      >
-                        {isRu ? "Отмена" : "Cancel"}
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={
-                          submitting ||
-                          (!editingNote && !name.trim()) ||
-                          !text.trim()
-                        }
-                        className="px-4 py-1.5 rounded-lg bg-zinc-100 text-zinc-950 text-xs font-medium hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        {submitting
-                          ? isRu
-                            ? "Сохраняем..."
-                            : "Saving..."
-                          : editingNote
-                            ? isRu
-                              ? "Сохранить"
-                              : "Save"
-                            : isRu
-                              ? "Приклеить"
-                              : "Stick it"}
-                      </button>
-                    </div>
-                  </form>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isComposerOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-white">
+                  {editingNote
+                    ? isRu
+                      ? "Редактировать стикер"
+                      : "Edit note"
+                    : isRu
+                      ? "Новый стикер"
+                      : "Pin a note"}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsComposerOpen(false);
+                    setEditingNote(null);
+                  }}
+                  className="text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                >
+                  <FaTimes size={13} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-3.5">
+                <div className="hidden">
+                  <input
+                    type="text"
+                    name="website"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">
+                    {isRu ? "Твоё имя" : "Your name"}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={30}
+                    value={name}
+                    disabled={Boolean(editingNote)}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={isRu ? "никнейм..." : "nickname..."}
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white placeholder-zinc-600 focus:outline-hidden focus:border-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">
+                    {isRu ? "Цвет стикера" : "Note color"}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {COLOR_OPTIONS.map((c) => (
+                      <button
+                        key={c.key}
+                        type="button"
+                        onClick={() => setColor(c.key)}
+                        className={`w-6 h-6 rounded-full ${c.dot} transition-transform cursor-pointer ${
+                          color === c.key
+                            ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-110"
+                            : "opacity-70 hover:opacity-100 hover:scale-105"
+                        }`}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">
+                    {isRu ? "Текст заметки" : "Message"}
+                  </label>
+                  <div className="relative">
+                    <textarea
+                      required
+                      rows={3}
+                      maxLength={160}
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      placeholder={
+                        isRu
+                          ? "оставь привет, совет или мысль..."
+                          : "say hi, leave feedback or a quick thought..."
+                      }
+                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white placeholder-zinc-600 focus:outline-hidden focus:border-zinc-600 resize-none"
+                    />
+                    <span className="absolute bottom-2 right-2.5 text-[10px] font-mono text-zinc-600">
+                      {text.length}/160
+                    </span>
+                  </div>
+                </div>
+
+                {errorMessage && (
+                  <p className="text-xs text-rose-400 bg-rose-950/40 border border-rose-900/60 rounded-md px-2.5 py-1.5 leading-snug">
+                    {errorMessage}
+                  </p>
+                )}
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsComposerOpen(false);
+                      setEditingNote(null);
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    {isRu ? "Отмена" : "Cancel"}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting || !text.trim() || !name.trim()}
+                    className="px-4 py-1.5 rounded-lg bg-zinc-100 text-zinc-950 text-xs font-medium hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {submitting
+                      ? isRu
+                        ? "Сохранение..."
+                        : "Saving..."
+                      : isRu
+                        ? "Прикрепить"
+                        : "Pin note"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
+
