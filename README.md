@@ -30,7 +30,6 @@ npm run dev
 `.env.local`:
 ```env
 VITE_ACCUWEATHER_API_KEY=
-VITE_MODRINTH_TOKEN=
 ```
 
 ## Visitor Counter (Optional)
@@ -43,4 +42,4 @@ VITE_MODRINTH_TOKEN=
 npm run build
 ```
 
-Vercel, Netlify, or any static host.
+Deployed on Vercel.

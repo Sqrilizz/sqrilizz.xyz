@@ -1,0 +1,48 @@
+#    _____            _ _ _            
+#   / ____|          (_) (_)           
+#  | (___   __ _ _ __ _| |_ ________   
+#   \___ \ / _` | '__| | | |_  /_  /   
+#   ____) | (_| | |  | | | |/ / / /    
+#  |_____/ \__, |_|  |_|_|_/___/___|   
+#             | |                      
+#             |_|                      
+#
+#  https://sqrilizz.tech | Developer from Tallinn
+#  Mods • Bots • Tools
+#
+#  "A robot may not injure a human being or, through inaction,
+#   allow a human being to come to harm." — Isaac Asimov
+#
+#  Curious human? Nice to meet you! Check out:
+#  - GitHub:   https://github.com/Sqrilizz
+#  - Modrinth: https://modrinth.com/user/Sqrilizz
+#  - Website:  https://sqrilizz.tech
+#
+
+# Social crawlers & link previewers (Discord Component Embeds enabled)
+User-agent: Discordbot
+User-agent: Twitterbot
+User-agent: TelegramBot
+User-agent: facebookexternalhit
+User-agent: WhatsApp
+User-agent: Slackbot
+Allow: /
+
+# Search engine crawlers
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Yandex
+Allow: /
+Disallow: /api/
+
+# General crawler policy
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /secret-coffee-machine/
+Disallow: /matrix/
+Disallow: /skynet/
+Disallow: /teleport/
+
+# Sitemap
+Sitemap: https://sqrilizz.tech/sitemap.xml

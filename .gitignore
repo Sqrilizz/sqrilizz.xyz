@@ -27,3 +27,6 @@ Thumbs.db
 *.log
 .vercel
 .env.production
+
+.fuse_hidden*
+skills/

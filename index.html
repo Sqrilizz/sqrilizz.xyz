@@ -2,10 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/avatar.png" />
-    <link rel="shortcut icon" href="/avatar.png" />
-    <link rel="apple-touch-icon" href="/avatar.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Literata:opsz,wght@7..72,400..700&display=swap" rel="stylesheet" />
     
     <title>Sqrilizz - Developer Portfolio</title>
     <meta name="description" content="developer from tallinn. mods, bots, tools." />
@@ -13,19 +15,82 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Sqrilizz" />
     <meta property="og:title" content="Sqrilizz - Developer Portfolio" />
-    <meta property="og:description" content="developer from tallinn. mods, bots, tools." />
-    <meta property="og:image" content="https://cdn.discordapp.com/attachments/1499602542471155873/1507830500889460776/arch.gif" />
+    <meta property="og:description" content="Матвей • dev from Tallinn. Building mods, bots & low-level tools." />
+    <meta property="og:url" content="https://www.sqrilizz.tech" />
+    <meta property="og:image" content="https://www.sqrilizz.tech/arch.gif" />
     
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Sqrilizz - Developer Portfolio" />
-    <meta name="twitter:description" content="developer from tallinn. mods, bots, tools." />
-    <meta name="twitter:image" content="https://cdn.discordapp.com/attachments/1499602542471155873/1507830500889460776/arch.gif" />
+    <meta name="twitter:description" content="Матвей • dev from Tallinn. Building mods, bots, tools & whatever seems fun." />
+    <meta name="twitter:image" content="https://www.sqrilizz.tech/arch.gif" />
     
-    <meta name="theme-color" content="#18181b" />
+    <meta name="theme-color" content="#7b5ea9" />
+
+    <!-- Discord Component Embed (PR #8606 Link Previews) -->
+    <link rel="discord:component-embed" type="application/json" href="https://www.sqrilizz.tech/discord-embed.json" />
+    <script id="discord:component-embed" type="application/json">
+    {
+      "component": {
+        "type": 17,
+        "accent_color": 8085161,
+        "components": [
+          {
+            "type": 9,
+            "components": [
+              {
+                "type": 10,
+                "content": "# **[Sqrilizz](https://www.sqrilizz.tech)**\n**Матвей** • dev from Tallinn\n*building mods, bots, tools & whatever seems fun.*\nlow-level stuff, systems & reverse engineering"
+              }
+            ],
+            "accessory": {
+              "type": 11,
+              "media": {
+                "url": "https://www.sqrilizz.tech/arch.gif"
+              },
+              "description": "Arch Linux 3D Wireframe"
+            }
+          },
+          {
+            "type": 14,
+            "spacing": 1
+          },
+          {
+            "type": 1,
+            "components": [
+              {
+                "type": 2,
+                "style": 5,
+                "url": "https://github.com/Sqrilizz",
+                "label": "GitHub"
+              },
+              {
+                "type": 2,
+                "style": 5,
+                "url": "https://modrinth.com/user/Sqrilizz",
+                "label": "Modrinth"
+              },
+              {
+                "type": 2,
+                "style": 5,
+                "url": "https://t.me/sqrilizz",
+                "label": "Telegram"
+              },
+              {
+                "type": 2,
+                "style": 5,
+                "url": "mailto:sqrilizzy@pm.me",
+                "label": "Email"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script data-goatcounter="https://sqrilizz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <script data-goatcounter="https://sqrilizz.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
   </body>
 </html>

@@ -27,10 +27,10 @@ import {
   FaMicrochip,
   FaMemory,
   FaHdd,
-  FaTablet,
+  FaTabletAlt,
 } from "react-icons/fa";
 
-function HeliumIcon({ size, className }) {
+function HeliumIcon({ size = 14, className = "" }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -51,40 +51,83 @@ const hardware = [
   {
     icon: FaLaptop,
     name: "ASUS TUF Gaming",
+    tag: "laptop",
     href: "https://www.asus.com/uk/laptops/for-gaming/tuf-gaming/2021-asus-tuf-gaming-f15/",
   },
-  { icon: FaMicrochip, name: "i5-11400H" },
-  { icon: SiNvidia, name: "RTX 3050" },
-  { icon: FaMemory, name: "16 GB DDR4" },
-  { icon: FaHdd, name: "NVMe SSD" },
-  { icon: FaTablet, name: "Kindle 10th Gen" },
+  { icon: FaMicrochip, name: "i5-11400H", tag: "cpu" },
+  { icon: SiNvidia, name: "RTX 3050", tag: "gpu" },
+  { icon: FaMemory, name: "16 GB DDR4", tag: "ram" },
+  { icon: FaHdd, name: "NVMe SSD", tag: "storage" },
+  {
+    icon: FaTabletAlt,
+    name: "Kindle 10th Gen",
+    tag: "chroot",
+    href: "https://github.com/sqrilizz/kindle-linux-chroot",
+  },
 ];
 
 const software = [
-  { icon: SiArchlinux, name: "CachyOS" },
-  { icon: SiKde, name: "KDE" },
-  { icon: SiZedindustries, name: "Zed" },
-  { icon: SiVscodium, name: "VS Code" },
-  { icon: SiGit, name: "Git" },
-  { icon: SiDocker, name: "Docker" },
-  { icon: HeliumIcon, name: "Helium" },
-  { icon: SiNotion, name: "Notion" },
-  { icon: SiTelegram, name: "Telegram" },
-  { icon: SiSteam, name: "Steam" },
+  {
+    icon: SiArchlinux,
+    name: "CachyOS",
+    tag: "os",
+    href: "https://cachyos.org",
+  },
+  { icon: SiKde, name: "KDE Plasma", tag: "de", href: "https://kde.org" },
+  {
+    icon: SiZedindustries,
+    name: "Zed",
+    tag: "editor",
+    href: "https://zed.dev",
+  },
+  {
+    icon: SiVscodium,
+    name: "VS Code",
+    tag: "editor",
+    href: "https://code.visualstudio.com",
+  },
+  {
+    icon: SiDocker,
+    name: "Docker",
+    tag: "containers",
+    href: "https://www.docker.com",
+  },
+  { icon: SiGit, name: "Git", tag: "vcs", href: "https://git-scm.com" },
+  { icon: HeliumIcon, name: "Helium", tag: "browser" },
+  { icon: SiNotion, name: "Notion", tag: "notes", href: "https://notion.so" },
+  {
+    icon: SiTelegram,
+    name: "Telegram",
+    tag: "chat",
+    href: "https://telegram.org",
+  },
+  {
+    icon: SiSteam,
+    name: "Steam",
+    tag: "gaming",
+    href: "https://store.steampowered.com",
+  },
 ];
 
 const languages = [
-  { icon: SiTypescript, name: "TypeScript" },
-  { icon: SiReact, name: "React" },
-  { icon: SiPython, name: "Python" },
-  { icon: SiRust, name: "Rust" },
-  { icon: FaJava, name: "Java" },
-  { icon: SiKotlin, name: "Kotlin" },
-  { icon: SiJavascript, name: "JavaScript" },
-  { icon: SiNodedotjs, name: "Node.js" },
-  { icon: SiTailwindcss, name: "Tailwind CSS" },
-  { icon: SiVite, name: "Vite" },
+  { icon: SiRust, name: "Rust", tag: "systems" },
+  { icon: SiTypescript, name: "TypeScript", tag: "typed" },
+  { icon: SiReact, name: "React", tag: "ui" },
+  { icon: SiPython, name: "Python", tag: "scripts" },
+  { icon: FaJava, name: "Java", tag: "backend" },
+  { icon: SiKotlin, name: "Kotlin", tag: "android" },
+  { icon: SiJavascript, name: "JavaScript", tag: "web" },
+  { icon: SiNodedotjs, name: "Node.js", tag: "runtime" },
+  { icon: SiTailwindcss, name: "Tailwind CSS", tag: "styling" },
+  { icon: SiVite, name: "Vite", tag: "build" },
 ];
+
+const fadeUp = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.4 },
+};
 
 export default function SetupSection() {
   const { t } = useTranslation();
@@ -96,32 +139,28 @@ export default function SetupSection() {
   ];
 
   return (
-    <section id="setup" className="py-24 px-6">
+    <section id="setup" className="py-20 px-6">
       <div className="max-w-3xl mx-auto">
-        <motion.h2
-          className="text-2xl font-semibold text-white mb-10"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-        >
-          {t("setupTitle")}
-        </motion.h2>
+        <motion.div {...fadeUp} className="mb-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {t("setupTitle")}
+          </h2>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((cat, ci) => (
             <motion.div
-              key={ci}
+              key={cat.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: ci * 0.08 }}
+              transition={{ duration: 0.4, delay: ci * 0.06 }}
             >
-              <p className="text-xs text-zinc-600 uppercase tracking-wider mb-4">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-3">
                 {cat.title}
               </p>
-              <div className="space-y-2">
-                {cat.items.map((item, i) => {
+              <div className="space-y-1.5">
+                {cat.items.map((item) => {
                   const Tag = item.href ? "a" : "div";
                   const linkProps = item.href
                     ? {
@@ -132,15 +171,28 @@ export default function SetupSection() {
                     : {};
                   return (
                     <Tag
-                      key={i}
+                      key={item.name}
                       {...linkProps}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-900/40 border border-zinc-800/50 ${item.href ? "hover:border-zinc-700 hover:bg-zinc-900/60 transition-all cursor-pointer" : ""}`}
+                      className={`group flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-900/40 border border-zinc-800/50 ${
+                        item.href
+                          ? "hover:border-zinc-700 hover:bg-zinc-900/70 transition-all cursor-pointer"
+                          : "hover:border-zinc-800/80 transition-colors"
+                      }`}
                     >
-                      <item.icon
-                        className="text-zinc-500 flex-shrink-0"
-                        size={15}
-                      />
-                      <span className="text-zinc-300 text-sm">{item.name}</span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <item.icon
+                          className="text-zinc-500 group-hover:text-zinc-300 flex-shrink-0 transition-colors"
+                          size={14}
+                        />
+                        <span className="text-zinc-300 group-hover:text-white text-xs font-medium truncate transition-colors">
+                          {item.name}
+                        </span>
+                      </div>
+                      {item.tag && (
+                        <span className="text-[10px] font-mono text-zinc-600 group-hover:text-zinc-400 flex-shrink-0 ml-2 transition-colors">
+                          {item.tag}
+                        </span>
+                      )}
                     </Tag>
                   );
                 })}

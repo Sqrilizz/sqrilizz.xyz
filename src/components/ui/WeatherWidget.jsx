@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const weatherDesc = (code, t) => {
-  if (code <= 1) return 'Clear'
-  if (code <= 3) return 'Cloudy'
-  if (code <= 48) return 'Foggy'
-  if (code <= 65) return 'Rain'
-  if (code <= 77) return 'Snow'
-  if (code <= 82) return 'Showers'
-  return 'Storm'
+  if (code <= 1) return t('weatherClear')
+  if (code <= 3) return t('weatherCloudy')
+  if (code <= 48) return t('weatherFoggy')
+  if (code <= 65) return t('weatherRain')
+  if (code <= 77) return t('weatherSnow')
+  if (code <= 82) return t('weatherShowers')
+  return t('weatherStorm')
 }
 
 export default function WeatherWidget() {
+  const { t } = useTranslation()
   const [temp, setTemp] = useState(null)
   const [desc, setDesc] = useState('')
 
@@ -20,7 +21,7 @@ export default function WeatherWidget() {
       .then(r => r.json())
       .then(data => {
         setTemp(Math.round(data.current.temperature_2m))
-        setDesc(weatherDesc(data.current.weather_code))
+        setDesc(weatherDesc(data.current.weather_code, t))
       })
       .catch(() => {})
 
@@ -29,13 +30,13 @@ export default function WeatherWidget() {
         .then(r => r.json())
         .then(data => {
           setTemp(Math.round(data.current.temperature_2m))
-          setDesc(weatherDesc(data.current.weather_code))
+          setDesc(weatherDesc(data.current.weather_code, t))
         })
         .catch(() => {})
     }, 30 * 60 * 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [t])
 
   if (temp === null) return null
 
